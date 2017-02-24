@@ -1,4 +1,4 @@
-	date	time	tweet	class
+	date	time	tweet	label
 0	2012-10-16 00:00:00	10:28:53-05:00	b'Kirkpatrick, who wore a baseball cap embroidered with Barack Obamas signature and had the hangdog look of Jason segel - Courier Journal'	0
 1	2016-12-10 00:00:00	10:09:00-05:00	b'Question: If Romney and Obama had a child-punching contest, and Mitt punched five and Obama punched none - who won?'	2
 2	2012-10-16 00:00:00	10:04:30-05:00	b'#obama debates that Cracker Ass Cracker tonight... I will be tuned in! #TeamObama'	1
@@ -632,7 +632,7 @@
 630	 10/13/2012	 PM 10:25:30	b'Hahaha  If Obama loses we should all move to Europe. Niggas in Paris'	-1
 631	 10/13/2012	 PM 10:27:58	b'I have to speak up. Anyone who votes for Obama is not educated on the facts about this guy'	-1
 632	 10/13/2012	 PM 10:30:04	b'Obama is taking days to study for the next debate because he doesnt know anything! How incompetant can a President be? We need Mitt!'	-1
-633	 10/13/2012	 PM 10:33:04	b'Obama was known as OBomber at high school for his skill in basketball broyyyxo'	irrelevant
+633	 10/13/2012	 PM 10:33:04	b'Obama was known as OBomber at high school for his skill in basketball broyyyxo'	-1
 634	 10/13/2012	 PM 10:33:19	b'Poll: Only 18% Of Israelis Think Obama Favors Israel Over The Palestinians'	-1
 635	 10/13/2012	 PM 10:35:44	b'Obama Admin Continues to Perfect the Blame Game'	0
 636	 10/13/2012	 PM 10:38:56	b'When Obama was bailing out Detroit how come he didnt do anything about the Tigers bullpen?'	-1
@@ -714,9 +714,9 @@
 712	 10/14/2012	 AM 9:43:	b'Obama team promises  more aggressive president in second debate Ya. Just what we need. More toward U S A'	1
 713	 10/13/2012		b'Obama Voters Once Again Voting On Skin Color; Not Policies BlackConservativesForRomney BetheChangeYouWant2See'	-1
 714	 10/13/2012	21:03:09	b'09  Barack Obama profile: Proud yet humbled  confident yet scared  a dreamer mugged by reality. #IdealBoyfriend'	-1
-715	 10/13/2012	  PM 9:3:24	b'NYY fans are ARROGANT. Who boos their own team. These fans are SCUMBAGS. Maybe there will be an earthquake? Possibly Obama voters?'	irrevelant
+715	 10/13/2012	  PM 9:3:24	b'NYY fans are ARROGANT. Who boos their own team. These fans are SCUMBAGS. Maybe there will be an earthquake? Possibly Obama voters?'	0
 716	  10/13/2012	  PM 9:5:02	b'Obama has now been in the longest presidential campaign ever (08) and now the most expensive. Interested to see what happens in 2016.'	2
-717	  10/13/2012 	 PM 9:9:15 	b'When we were at party city and I put on the Obama mask and Pepe was actually scared lmao hahaha'	irrevelant
+717	  10/13/2012 	 PM 9:9:15 	b'When we were at party city and I put on the Obama mask and Pepe was actually scared lmao hahaha'	0
 718	  10/13/2012	  PM 11:27:44	b'Obama a real nigga he gave his WIFE a SHOUTOUT on CNN while some of you guys wont even put your girlfriends in your bio.'	1
 719	  10/13/2012	  PM 11:35:40	b'haha i never sed u were bro im sayin if romney is elected were in bigger trouble.. Obama has a plan and needs more time'	1
 720	  10/13/2012	  PM 11:35:58 	b'You want to extend the wars in the middle east Obama? How about you get ready to sign your daughters up for service when they turn 18!'	-1
@@ -738,7 +738,7 @@
 736	 10/14/2012	 AM 0:1:37	b'CBS and MSNBC Journalists: Bidens Libya Security Answer Could Mean Big Trouble for Obama via'	-1
 737	 10/14/2012	 AM 0:7:13	b'More Obama  supporters threaten to kill Romney if he becomes president via #DEMons'	-1
 738	  10/14/2012 	 AM 0:7:37 	b'On the economy Obama team a better bet than the GOP alternative'	1
-739	  10/14/2012 	 AM 0:7:48 	b'Not gonna have to pay MooChelle will be Kicking Obamas Ass to the concession mic. Best part Watch Free on Foxnews...Lmao..!!!'	irrevelant
+739	  10/14/2012 	 AM 0:7:48 	b'Not gonna have to pay MooChelle will be Kicking Obamas Ass to the concession mic. Best part Watch Free on Foxnews...Lmao..!!!'	0
 740	  10/14/2012 	 AM 0:8:09  	b'foxnewsradio I hear Obama is working on how he can attack Romney on his tax returns again'	0
 741	 10/14/2012	 AM 0:10:20	b'Obama Believes in America; does Mitt Romney? via @allvoices'	1
 742	 10/14/2012	 AM 0:11:00	b'My mom is 81. She will not vote for Obama. Thankfully shes a hardcore Democrat so shes sitting this one out.'	-1
@@ -747,33 +747,33 @@
 745	 10/14/2012	 AM 0:29:25	b'Obama will be president of America forever.'	1
 746	 10/14/2012	 AM 0:30:11	b'If Romney supporters are now firing shots into Obama Campaign offices. I am not going to go into Romney offices. Not for some time to come'	1
 747	 10/14/2012	 AM 0:32:30	b'Agreed.  I think Obama will do better this time'	1
-748	  10/14/2012	  AM 0:36:09	b'My Obama 44 Button Collectors Set arrived yesterday!'	irrevelant
+748	  10/14/2012	  AM 0:36:09	b'My Obama 44 Button Collectors Set arrived yesterday!'	0
 749	 10/14/2012	 AM 0:42:22	b'Would that be the auto-bailout Bush organized before Obama decided to let them go bankrupt?'	-1
 750	 10/14/2012	 AM 0:44:23	b'How many times has Obama referred to US jobs. Its a myth. We live in a global economy. #sensata'	2
-751	 10/14/2012	 AM 0:49:41	b'Question of the nightof 2pac and Biggie was still alive who do you think would of met Obama first #Random'	irrevelant
-752	  10/14/2012 	 AM 0:50:02 	b'Obama get more bitches than Romney!'	irrevelant
+751	 10/14/2012	 AM 0:49:41	b'Question of the nightof 2pac and Biggie was still alive who do you think would of met Obama first #Random'	0
+752	  10/14/2012 	 AM 0:50:02 	b'Obama get more bitches than Romney!'	0
 753	 10/14/2012	 AM 0:53:32	b'Confirmed: Obama Campaign Is Out of Ideas #TRUTH #TCOT #TLOT'	-1
 754	  10/14/2012	  AM 1:1:59  	b'There is simply no excuse for what happened in Benghazi.  And it is really hurting Obama big time.'	-1
 755	2012-10-14 00:00:00	AM 1:7:54  	b'you do know Obama  is half white right?  Why does everyone think Obama is black?  He is Muslim as well. But okay'	1
-756	 10/14/2012	 AM 1:11:02	b'Obama gangnam styleeee'	irrevelant
+756	 10/14/2012	 AM 1:11:02	b'Obama gangnam styleeee'	0
 757	 10/14/2012	 AM 1:16:20	b'President Obamas performance during the debate didnt bother me - his performance as President however is another story all together'	2
 758	 10/14/2012	 AM 1:19:49	b'Well said RT Poor Obama imagine the mess hes going to inherit if he wins :('	0
-759	 10/14/2012	 AM 1:20:38	b'So Jessicas dating Obama. Lol'	irrevelant
+759	 10/14/2012	 AM 1:20:38	b'So Jessicas dating Obama. Lol'	0
 760	 10/14/2012	 AM 1:20:59	b'why wont Obama release his school transcripts and let us know who paid for his college?'	2
 761	 10/14/2012	 AM 1:24:30	b'So complains that Unemployment is increasing under the Obama administration BUT hes sending jobs to China.'	2
 762	 10/14/2012	 AM 1:25:58	b'Barack Obamas presidency has not helped cause of black people in US via @guardian'	-1
 763	  10/14/2012 	 AM 1:28:57  	b'Obama for president'	1
-764	 10/14/2012	 AM 1:34:11	b'. yes bitch . Im slim Obama James.'	irrevelant
+764	 10/14/2012	 AM 1:34:11	b'. yes bitch . Im slim Obama James.'	0
 765	 10/14/2012	 AM 1:37:24	b'Damn I heard if mitt  Romney win. Its not gonma be no more free porn.. Shit lets all vote for Obama! #TeamObama'	1
 766	  10/14/2012 	 AM 1:37:38  	b'Black people only like Obama because hes black too lol #lezbehonest'	2
 767	  10/14/2012	  AM 1:37:52	b'Obama  Voters Once Again Voting On Skin Color; Not Policies BlackConservativesForRomney BetheChangeYouWant2See'	-1
-768	 10/14/2012	 AM 1:44:44	b'Just looked outside and noticed someone stole our Romney sign. Seriously you #Obama people need to grow the hell up!'	irrevelant
+768	 10/14/2012	 AM 1:44:44	b'Just looked outside and noticed someone stole our Romney sign. Seriously you #Obama people need to grow the hell up!'	0
 769	 10/14/2012	 AM 1:54:09	b'Pure BS.  You wanted Biden to be more in control of his emotions?  Worked great for Obama didnt it?  IDIOT.'	2
 770	 10/14/2012	 AM 2:2:10	b'WIRE: Do black people support Obama because hes black?'	-1
 771	 10/14/2012	 AM 2:12:12	b'Good night Patriots Im going to try and zzz. Please rally behind Romney/Ryan & lets get that Nightmare Obama outta the house. I need zzzs!'	-1
 772	 10/14/2012	 AM 2:16:47	b'Mitt Romney just popped up in my Who to Follows . ----> Gtfooo lol #Obamanation'	1
 773	  10/14/2012	  AM 2:19:22	b'Vote for Obama. Obama Based God.'	1
-774	  10/14/2012 	 AM 2:25:38  	b'Try the Romney Vs Obama  Free Boxing Game. See how many rounds they can last tonight!'	irrevelant
+774	  10/14/2012 	 AM 2:25:38  	b'Try the Romney Vs Obama  Free Boxing Game. See how many rounds they can last tonight!'	0
 775	 10/14/2012	 AM 2:31:51	b'Re-elect President Obama'	1
 776	  10/14/2012	  AM 2:40:20	b'#Obama weighs in on #AmericanIdol feud. Shouldnt have read this after watching Benghazi hearings. The man disgusts me.'	-1
 777	 10/14/2012	 AM 3:0:42	b'Obama must have known what happened in Libya! Your Pres. Involved in a scandal-FIRE HIM!'	-1
@@ -786,7 +786,7 @@
 784	  10/14/2012	  AM 3:39:56	b'- Jay McInerney on Obama: We have to give him a second chance'	1
 785	 10/14/2012	 AM 4:15:01	b'Irreligious people on the rise? Or just suspicious polling practices? No Obama - Vote for Mitt Romney'	-1
 786	 10/14/2012	 AM 4:31:44	b'Obamas name misspelled in sample ballots in New York county: Tweet Washington'	0
-787	 10/14/2012	 AM 4:51:50	b'Jay Z and Beyonce had a 4 million dollar dinner with Barack Obama... wtf did they eat? Fresh Dinosaur?'	irrevelant
+787	 10/14/2012	 AM 4:51:50	b'Jay Z and Beyonce had a 4 million dollar dinner with Barack Obama... wtf did they eat? Fresh Dinosaur?'	0
 788	  10/14/2012 	 AM 4:57:03  	b'Obama campaign says it surpasses 4 million donors - Yahoo! News via @YahooNews'	1
 789	 10/14/2012	 AM 4:59:58	b'Rupert Murdoch comments on Obama re-election pretty rich. This coming from someone who backed GW and all the shit he did. Short memory.'	2
 790	 10/14/2012	 AM 5:6:09	b'=========> Bill Clinton is back in the campaign game on behalf of President Obama:'	0
@@ -813,7 +813,7 @@
 811	 10/14/2012	 AM 7:19:56	b'War Breaks Out Between Clintons & Obama.  No surprise!'	2
 812	 10/14/2012	 AM 7:21:32	b'Miners Fight Back Against Obama TV Ad: Absolute Lies:    tell Obama to stop the absolute lies watch and #RT PLZ +TY'	-1
 813	  10/14/2012  	AM 7:26:40  	b'As Our Economy is Outsourced to China the Obama Administration Once Again ...'	-1
-814	  10/14/2012  	AM 7:30:39	b'Fox News be goin in on Obama.'	irrevelant
+814	  10/14/2012  	AM 7:30:39	b'Fox News be goin in on Obama.'	0
 815	 10/14/2012	 AM 7:34:15	b'The business model of lower taxes for 12+ years with the Bush/Obama tax cuts for the wealthy served to redistribute wealth upward #uppers'	2
 816	  10/14/2012	  AM 7:41:31	b'Obamas slippery foreign oil promise'	2
 817	  10/14/2012	  AM 7:42:07	b'Obama Cuts Defense Programs'	2
@@ -844,7 +844,7 @@
 842	 10/14/2012	 AM 8:45:12	b'Parents Say School is Turning Kids into Obama Activists  Didnt Hitler Do the Same thing? #RT #FF #TCOT'	-1
 843	 10/14/2012	 AM 8:45:45	b'#TheBuckStopHere#Obama stop blaming your problems on others: The Economy:Bush Benghazi:Intell Dept. B the leader 47% of U.S. thinks U R.nomy:Bush'	-1
 844	 10/14/2012  	AM 8:50:24	b'Wow the Obama campaign is reaching deep into their bag of psychological tricks. They are on the run. #lastresorts'	2
-845	 10/14/2012	 AM 8:52:59	b'Obama 2016 Movie Races to Box Office #1 via @Newsmax_Media'	irrevelant
+845	 10/14/2012	 AM 8:52:59	b'Obama 2016 Movie Races to Box Office #1 via @Newsmax_Media'	0
 846	 10/14/2012	 AM 8:53:19	b'they say the U.S cant put up with another four years of Obama but the U.S put up with 8 HORRIBLE years of Bush Get Real #teamOBAMA'	1
 847	 10/14/2012	 AM 8:55:30	b'.That sounds dangerous and scary. Much like the Obama administration. No one wants to see more of that.'	-1
 848	  10/14/2012	  AM 8:55:43	b'Catholic church: Voting for Obama may cause you to burn in hell via @examinercom'	-1
@@ -879,7 +879,7 @@
 877	  10/14/2012 	 AM 9:53:29  	b'3 months 5 days 16 hours 59 minutes and 59 seconds until #Obama leaves office.'	-1
 878	  10/14/2012 	 AM 9:53:56  	b'Shot fired at Denver Obama campaign officeThis is wrong no matter who does it.'	2
 879	  10/14/2012  	AM 9:54:59  	b'[Breitbart] CNN Pushes AZ Poll With Obama In Lead'	2
-880	  10/14/2012	  AM 9:57:10	b'Obama Classmate: He Told Us His Father Was an Indonesian King He Was a Prince & Would Be a Ruler  #ocra #tcot'	irrevelant
+880	  10/14/2012	  AM 9:57:10	b'Obama Classmate: He Told Us His Father Was an Indonesian King He Was a Prince & Would Be a Ruler  #ocra #tcot'	0
 881	  10/14/2012  	AM 9:58:39 	b'Remember Valarie Jarrett was born in Iran and shes the force behind Obama. Obamas the empty suit.'	-1
 882	 10/14/2012	 AM 10:0:56	b'stop posting on my twitter account. You are spamming. I am voting for Romney!!!!!!'	-1
 883	 10/14/2012	 AM 10:1:21	b'RT for Obama Ignore For Romney !'	1
@@ -892,7 +892,7 @@
 890	  10/14/2012 	 AM 10:15:55	b'cnnireport/candycro America can see how Obama rescued General motors and save lot of jobs Governor Romney said let them go bankrupt'	1
 891	 10/14/2012	 AM 10:16:23	b'something along the lines of if Obama gets reelected its the end of America  and no info to back this up I was so confused'	2
 892	  10/14/2012	  AM 10:18:03	b'Were twenty-some days away from voting and Obamas last minute appeal is to fairness? Does he WANT to lose?! #Uncle'	2
-893	 10/14/2012	 AM 10:18:38	b'Overheard someone at work blaming Obama for No Child Left Behind. I cant wait until this is over.'	irrevelant
+893	 10/14/2012	 AM 10:18:38	b'Overheard someone at work blaming Obama for No Child Left Behind. I cant wait until this is over.'	0
 894	 10/14/2012	 AM 10:20:03	b'Expect more pain at the pump in second Obama term #tcot #p2 #teaparty #Mitt2012 #ObamaIsntWorking'	-1
 895	  10/14/2012  	AM 10:22:23  	b'The Administrations cover up in Libya was necessary because it did not fit Obamas foreign policy narrative.'	2
 896	  10/14/2012	  AM 10:22:34	b'I thank Obama for the crack law'	1
@@ -914,7 +914,7 @@
 912	  10/14/2012	  AM 11:45:32	b'Splainy'	-1
 913	  10/14/2012  	AM 11:58:32  	b'Obama planning presidential debate comeback in Virginia'	0
 914	 10/14/2012	 PM 12:2:50	b'Destructive President a ebook about #Obama by studies #President #Obama about his alcohol use'	-1
-915	 10/14/2012	 PM 12:8:48	b'Obama is coming here Wednesday.. I bet he wishes he could go to slice night with us'	irrevelant
+915	 10/14/2012	 PM 12:8:48	b'Obama is coming here Wednesday.. I bet he wishes he could go to slice night with us'	0
 916	"	 10/14/201"	 PM 12:10:52	b'Obama is never cramming FACTS. Like a snake he deflects'	2
 917	"	 10/14/2012"	  PM 12:11:03 	b'Blog: Campaign surrogates say Obama has crucial task in second debate'	2
 918	"	 10/14/202"	 PM 12:11:12 	b'Romney  thinks the country is so broken that Social Security/Medicare have no future; Obama thinks the country is so strong that it can grow.'	2
@@ -925,7 +925,7 @@
 923	 10/14/2012 	  PM 12:29:53 	b'I agree I just dont think Obamas religious beliefs are any better than Romneys (politics aside).'	2
 924	"	 10/14/201 "	  PM 12:30:08 	b'Household Incomes Fall In Aug. Off 8.2% Under Obama'	-1
 925	"	 10/14/201 "	  PM 12:31:37	b'ok O-Bot Obama MAY win Iowa but not Ohio and Romney will carry WI'	2
-926	 10/14/2012	 PM 12:34:12	b'When we drive past a protest against Obama #omg #wtf'	irrevelant
+926	 10/14/2012	 PM 12:34:12	b'When we drive past a protest against Obama #omg #wtf'	0
 927	 10/14/2012	 PM 12:36:35	b'what does ur female emotions have to do with this fact #Sensata Obama leads Romney'	2
 928	"	 10/14/201 "	 PM 12:43:05	b'Has anyone seen 2016 Obama America very interesting facts about Obama past'	0
 929	 10/14/2012	 PM 12:43:43	b'Ron Paul Sees No Difference Between Mitt Romney and Barack Obama - Yahoo! News THAT A GOOD WAY OF'	2
@@ -987,14 +987,14 @@
 985	 10/14/2012	   PM 3:7:15  	b'J woww is voting for Obama. I always knew she was the best cast member.'	1
 986	 10/14/2012	 PM 3:7:43	b'Dont speak for the rich and say that Obama has raised taxes. He wants the rich pay the just not fair amount of taxes they should pay.'	1
 987	 10/14/2012	  PM 3:7:56  	b'Winston Salem Journal endorses Obama. They havent endorsed a Democrat since 1964. Obama is the best choice for president #p2'	1
-988	 10/14/2012	 PM 3:10:33	b'NYT Article: Obama supporters often prefer & smooth jazz. Romney supporters prefer & college football. Really??'	irrevelant
+988	 10/14/2012	 PM 3:10:33	b'NYT Article: Obama supporters often prefer & smooth jazz. Romney supporters prefer & college football. Really??'	0
 989	 10/14/2012	 PM 3:11:01	b'Another Obama Admin. oops! Darrell Issa Looking Into September Jobs Report [UPDATE] via'	-1
 990	 10/14/2012	 PM 3:12:37  	b'no and for the record I blame Obama. His presidency is so bad it even hurtsjobs in the stratosphere. Haha beat you to it!'	-1
 991	 10/14/2012	   PM 3:13:09  #Obama 	b'nan'	0
 992	 10/14/2012	 PM 3:15:01	b'New poll...... Swing States and National....  Romney 49.  Obama 47. President Romney is almost here.'	2
 993	 10/14/2012	  PM 3:15:23  	b'Want to vote twice for Obama?  Sure... go ahead!'	1
 994	 10/14/2012	 PM 3:15:36	b'#Actress #Singer President Obama talks Nicki Minaj-Mariah Carey fight on the...'	0
-995	 10/14/2012	 PM 3:17:15	b'Whats Obamas last name?'	irrevelant
+995	 10/14/2012	 PM 3:17:15	b'Whats Obamas last name?'	0
 996	 10/14/2012	 PM 3:21:53	b'The Vice Presidential debate between #Biden and #Ryan. #USA #White_House #Obama #Romney -'	2
 997	 10/14/2012	 PM 3:24:58	b'Obama Surrogate: Benghazi Never Asked For More Security | Conservative Byte Trying the first story again?'	-1
 998	 10/14/2012	  PM 3:25:32  	b'Axelrod Refuses to Say Whether Obama Met with Natl Security Team Before Heading to Las Vegas'	-1
@@ -1073,7 +1073,7 @@
 1071	 10/14/2012	 PM 5:48:43	b'In second debate Obama faces challenges on key issues: * Romney makes up ground on host of issues - Reuters/Ips...'	2
 1072	 10/14/2012	 PM 5:48:48	b'I just made a ,a>donation today to support President Obama. How about you?'	1
 1073	 10/14/2012	 PM 5:50:38	b'Study: over a million constructionjobs have been lost under Obama. So THATS what he meant by you didnt build that. ~ Fred Thompson'	-1
-1074	 10/14/2012	 PM 5:50:52	b'Still better than Obama Vs Romney #mlbmemes @BigSackJack24'	irrevelant
+1074	 10/14/2012	 PM 5:50:52	b'Still better than Obama Vs Romney #mlbmemes @BigSackJack24'	0
 1075	"	 10/14/2012"	 PM 5:52:02	b'Obama team hits back hard at Romney over Libya - AFP'	0
 1076	 10/14/2012	 PM 5:54:19	b'Churchill and Obama'	0
 1077	"	 10/14/2012"	 PM 5:54:45	b'What an endorsement for Obama : Theporn industry wants to do it one more time with President Obama. #Porn #erection'	1
@@ -1116,11 +1116,11 @@
 1114	 10/14/2012	 PM 6:48:08	b'LIST OF Obama LIES 2012 - UPDATED ... #TCOT #LNYHBT'	-1
 1115	 10/14/2012	 PM 6:52:26	b'Watching Chris Wallace he should have  demanded answers for WHAT and WHEN Obama  knew about The Libyan attack. Biden debate  = LIES!!'	-1
 1116	 10/14/2012	 PM 6:52:54	b'So in these 2 debates...Obama couldnt look up and Biden couldnt shut up! #tcot #teaparty'	-1
-1117	 10/14/2012	 PM 6:54:39	b'Guys everyone knows that Obama and Romney are gonna lose to me in the election.'	irrevelant
+1117	 10/14/2012	 PM 6:54:39	b'Guys everyone knows that Obama and Romney are gonna lose to me in the election.'	0
 1118	 10/14/2012	 PM 6:54:49	b'Obama Campaign Confronts Coal Miners With Lies: With its false attack on mine workers who support Mitt Romney'	-1
 1119	 10/14/2012	 PM 6:56:56	b'Obama  Romney'	2
 1120	 10/14/2012	 PM 6:59:03	b'A Terrifying Threat Obama and Romney Arent Talking About - Bloomberg: ABC NewsA Terrifying Threat Obama and Rom...'	2
-1121	 10/14/2012	 PM 7:0:44	b'This is amazing!  You are revealing the US healthcare problem better than even Obama has!  #insurancepoll #innovativethinking'	irrevelant
+1121	 10/14/2012	 PM 7:0:44	b'This is amazing!  You are revealing the US healthcare problem better than even Obama has!  #insurancepoll #innovativethinking'	0
 1122	 10/14/2012	 PM 7:2:20	b'Colbert says he cant tell differences between Romney Obama: Comedian Stephen Colbert says it will make a...'	2
 1123	 10/14/2012	 PM 7:2:33	b'Thats because Obama is the worse president since Jimmy Carter on second thought he is the worse.'	-1
 1124	 10/14/2012	 PM 7:4:17	b'haha I think both he and Obama have aged a lot over the past four years. Its been a stressful four years for them'	2
@@ -1840,7 +1840,7 @@
 1838	10/16/2012	PM 9:34:07	b'Wooow that look on Mitts face was out there! Obama know cheap labor  is profitable too though thats jus. Business #IjS'	2
 1839	10/16/2012	PM 9:34:08	b'General Electric Paid No Federal Taxes in 2010 - ABC News (via Obama has been trying to fix these issues'	1
 1840	10/16/2012	PM 9:34:09	b'My TL right now is full of Obama & Romney tweets.. lolzz'	2
-1841	10/16/2012	PM 9:34:11	b'much better debate. Debatings the winner. And Obama. Great joke about pension size'	
+1841	10/16/2012	PM 9:34:11	b'much better debate. Debatings the winner. And Obama. Great joke about pension size'	1
 1842	10/16/2012	PM 9:34:13	b'I just dont like the way Obama talks. #cocky'	-1
 1843	10/16/2012	PM 9:34:14	b'Obamas hand when hes talking >>>'	0
 1844	10/16/2012	PM 9:34:20	b'Loves how Romney wont let Obama talk!#Debates'	2
@@ -6954,11 +6954,11 @@
 6952	 10/17/2012	 AM 1:14:19	b'#CSPAN2012 Well its important for everyone to know that #Obama inherited a country in shambles...'	1
 6953	 10/17/2012	 AM 1:15:12	b'Obama is back on track ... LIKE'	1
 6954	 10/17/2012	 AM 1:16:54	b'Another Mis-Step... Another Obama green energy company collapses :'	-1
-6955			b'41199 AM 0.054849537037037 Opinion: Obama aces comeback'	
-6956			b'41199 AM 0.0549537037037037 NEWS Heated go-round: When did Obama call Libya attack act of terror?: During the second presidential debate...'	
-6957			b'41199 AM 0.0566435185185185 How Obama aced the comeback: In his second debate with Mitt Romney, U.S. president Barack Obama delivered a perf...'	
+6955			b'41199 AM 0.054849537037037 Opinion: Obama aces comeback'	0
+6956			b'41199 AM 0.0549537037037037 NEWS Heated go-round: When did Obama call Libya attack act of terror?: During the second presidential debate...'	0
+6957			b'41199 AM 0.0566435185185185 How Obama aced the comeback: In his second debate with Mitt Romney, U.S. president Barack Obama delivered a perf...'	0
 6958	 10/17/2012	 AM 1:23:51	b'Shyne Calls president Obama Corny   Supports Romney #EntNews'	0
-6959			b'41199 AM 0.0587962962962963 Poll: Obama edges Romney in second debate - CBS News ['	
+6959			b'41199 AM 0.0587962962962963 Poll: Obama edges Romney in second debate - CBS News ['	0
 6960	 10/17/2012	 AM 1:26:12	b'#djournal Face to face: Obama  Romney in crackling debate - FACEBOOK QUESTION: Tuesday October 16 2012 Who won the...'	2
 6961	 10/17/2012	 AM 1:28:02	b'Election 2012: The Decision For Investors - Obama Vs. Romney on taxes  dividends and investment gains.'	2
 6962	 10/17/2012	 AM 1:28:18	b'Romney = Biggot #Obama'	2

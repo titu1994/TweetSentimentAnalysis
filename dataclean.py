@@ -14,6 +14,9 @@ romney_df = pd.read_excel(data_path, sheetname=1)
 
 def clean_text(row):
     row = str(row).encode('ascii', 'ignore').strip()
+    #row = row.replace(b',', b'') # removes commas
+    #row = row.replace(b'.', b'') # remove periods
+    #row = row.replace(b'#', b'') # remove hash symbol
     return row
 
 obama_df['tweet'] = obama_df['tweet'].apply(clean_text)
