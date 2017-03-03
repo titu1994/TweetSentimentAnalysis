@@ -3,11 +3,27 @@ import numpy as np
 import os
 import pickle
 
+from sklearn.model_selection import StratifiedKFold
+
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
+from keras.callbacks import ModelCheckpoint
+from keras.utils.np_utils import to_categorical
 
 if not os.path.exists('models/'):
     os.makedirs('models/')
+
+if not os.path.exists('models/conv/'):
+    os.makedirs('models/conv/')
+
+if not os.path.exists('models/conv_lstm/'):
+    os.makedirs('models/conv_lstm/')
+
+if not os.path.exists('models/lstm/'):
+    os.makedirs('models/lstm/')
+
+if not os.path.exists('models/n_conv/'):
+    os.makedirs('models/n_conv/')
 
 train_obama_path = "data/obama_csv.csv"
 train_romney_path = "data/romney_csv.csv"
@@ -90,6 +106,9 @@ def load_both():
         row = romney_df.iloc[i]
         texts.append(str(row['tweet']))
         labels.append(labels_index[int(row['label'])])
+
+    texts = np.asarray(texts)
+    labels = np.asarray(labels)
 
     return texts, labels, labels_index
 
@@ -189,6 +208,47 @@ def prepare_validation_set(data, labels, validation_split=0.1, seed=1000):
 
     return (x_train, y_train, x_val, y_val)
 
+
+def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_length=140, k_folds=3,
+                         nb_epoch=40, batch_size=100, seed=1000):
+
+    texts, labels, label_map = load_both()
+    data, word_index = prepare_tokenized_data(texts, max_nb_words, max_sequence_length)
+
+    skf = StratifiedKFold(k_folds, shuffle=True, random_state=seed)
+
+    fbeta_scores = []
+
+    for i, (train_idx, test_idx) in enumerate(skf.split(texts, labels)):
+        x_train, y_train = data[train_idx, :], labels[train_idx]
+        x_test, y_test = data[test_idx, :], labels[test_idx]
+
+        y_train_categorical = to_categorical(np.asarray(y_train))
+        y_test_categorical = to_categorical(np.asarray(y_test))
+
+        model = model_gen()
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', 'fbeta_score'])
+
+        checkpoint = ModelCheckpoint('models/%s-cv-%d.h5' % (model_fn, i + 1), monitor='val_fbeta_score', verbose=2,
+                                 save_weights_only=True,
+                                 save_best_only=True, mode='max')
+
+        model.fit(x_train, y_train_categorical, validation_data=(x_test, y_test_categorical),
+                  callbacks=[checkpoint], nb_epoch=nb_epoch, batch_size=batch_size)
+
+        model.load_weights('models/%s-cv-%d.h5' % (model_fn, i + 1))
+
+        scores  = model.evaluate(x_test, y_test_categorical, batch_size=batch_size)
+        fbeta_scores.append(scores[-1])
+
+        print('F1 Scores of %d Cross Validation : %0.4f' % (i + 1, scores[-1]))
+
+        del model
+
+    print("Average fbeta score : ", sum(fbeta_scores) / len(fbeta_scores))
+
+    with open('models/%s-scores.txt' % (model_fn), 'w') as f:
+        f.write(str(fbeta_scores))
 
 if __name__ == '__main__':
     texts, labels, label_map = load_obama()
