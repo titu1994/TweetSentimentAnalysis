@@ -1,2 +1,3 @@
 embedding/*
 data/*.h5
+models/*
