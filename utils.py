@@ -241,7 +241,7 @@ def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_l
         scores  = model.evaluate(x_test, y_test_categorical, batch_size=batch_size)
         fbeta_scores.append(scores[-1])
 
-        print('F1 Scores of %d Cross Validation : %0.4f' % (i + 1, scores[-1]))
+        print('\nF1 Scores of %d Cross Validation : %0.4f' % (i + 1, scores[-1]))
 
         del model
 
