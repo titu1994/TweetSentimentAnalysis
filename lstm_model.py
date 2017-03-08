@@ -38,7 +38,7 @@ def gen_model():
     # train a Long Short Term Memory network followed by Fully Connected layers
     sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
     embedded_sequences = embedding_layer(sequence_input)
-    x = LSTM(256, dropout_W=0.1, dropout_U=0.1, return_sequences=False)(embedded_sequences)
+    x = LSTM(512, dropout_W=0.1, dropout_U=0.1, return_sequences=False)(embedded_sequences)
     x = Dense(1024, activation='relu')(x)
     x = Dropout(0.5)(x)
     preds = Dense(3, activation='softmax')(x)

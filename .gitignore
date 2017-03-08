@@ -1,3 +1,4 @@
 embedding/*
 data/*.h5
 models/*/*.h5
+models/*/*.pkl

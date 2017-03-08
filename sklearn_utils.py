@@ -84,7 +84,7 @@ def train_keras_model_cv(model, model_fn, k_folds=3, seed=1000):
 
         print('\nF1 Scores of Estimator %d: %0.4f' % (i + 1, f1score))
 
-        joblib.dump(model, 'models/%s-cv-%d.h5' % (model_fn, i + 1))
+        joblib.dump(model, 'models/%s-cv-%d.pkl' % (model_fn, i + 1))
 
         del model
 
