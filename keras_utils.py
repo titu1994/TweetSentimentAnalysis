@@ -7,7 +7,7 @@ from sklearn.model_selection import StratifiedKFold
 
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.utils.np_utils import to_categorical
 
 if not os.path.exists('models/'):
@@ -21,6 +21,9 @@ if not os.path.exists('models/conv_lstm/'):
 
 if not os.path.exists('models/lstm/'):
     os.makedirs('models/lstm/')
+
+if not os.path.exists('models/gru/'):
+    os.makedirs('models/gru/')
 
 if not os.path.exists('models/n_conv/'):
     os.makedirs('models/n_conv/')
@@ -229,19 +232,22 @@ def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_l
         model = model_gen()
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', 'fbeta_score'])
 
-        checkpoint = ModelCheckpoint('models/%s-cv-%d.h5' % (model_fn, i + 1), monitor='val_fbeta_score', verbose=2,
+        model_checkpoint = ModelCheckpoint('models/%s-cv-%d.h5' % (model_fn, i + 1), monitor='val_fbeta_score', verbose=2,
                                  save_weights_only=True,
                                  save_best_only=True, mode='max')
 
+        reduce_lr = ReduceLROnPlateau(monitor='val_fbeta_score', patience=5, mode='max',
+                                      factor=0.5, cooldown=5, min_lr=1e-6, verbose=2)
+
         model.fit(x_train, y_train_categorical, validation_data=(x_test, y_test_categorical),
-                  callbacks=[checkpoint], nb_epoch=nb_epoch, batch_size=batch_size)
+                  callbacks=[model_checkpoint, reduce_lr], nb_epoch=nb_epoch, batch_size=batch_size)
 
         model.load_weights('models/%s-cv-%d.h5' % (model_fn, i + 1))
 
         scores  = model.evaluate(x_test, y_test_categorical, batch_size=batch_size)
         fbeta_scores.append(scores[-1])
 
-        print('\nF1 Scores of %d Cross Validation : %0.4f' % (i + 1, scores[-1]))
+        print('\nF1 Scores of Cross Validation %d: %0.4f' % (i + 1, scores[-1]))
 
         del model
 

@@ -6,7 +6,7 @@ from keras.layers import Embedding, LSTM
 from keras.callbacks import ModelCheckpoint
 from keras.models import Model
 
-from utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
+from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
 
 
 MAX_NB_WORDS = 16000
@@ -38,8 +38,7 @@ def gen_model():
     # train a Long Short Term Memory network followed by Fully Connected layers
     sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
     embedded_sequences = embedding_layer(sequence_input)
-    x = LSTM(256, activation='relu', dropout_W=0.1, dropout_U=0.1, return_sequences=False)(embedded_sequences)
-    #x = LSTM(256, dropout_W=0.2, dropout_U=0.2, return_sequences=False)(x)
+    x = LSTM(256, dropout_W=0.1, dropout_U=0.1, return_sequences=False)(embedded_sequences)
     x = Dense(1024, activation='relu')(x)
     x = Dropout(0.5)(x)
     preds = Dense(3, activation='softmax')(x)
@@ -49,5 +48,5 @@ def gen_model():
 
 if __name__ == '__main__':
     train_keras_model_cv(gen_model, 'lstm/lstm-model', max_nb_words=MAX_NB_WORDS,
-                         max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
+                         max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=5,
                          nb_epoch=50)

@@ -10,7 +10,7 @@ from keras.models import Model
 
 from keras import backend as K
 
-from utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
+from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
 
 
 MAX_NB_WORDS = 16000
@@ -56,25 +56,33 @@ def gen_model():
 
     sequence_input_conv = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
     embedding_sequences_conv = embedding_layer_conv(sequence_input_conv)
-    y = Conv1D(512, 5, border_mode='same')(embedding_sequences_conv)
-    y = LeakyReLU(alpha=0.1)(y)
-    #y = MaxPooling1D(3)(y)
-    #y = Conv1D(512, 5, border_mode='same')(y)
-    #y = LeakyReLU(alpha=0.1)(y)
-    #y = MaxPooling1D(3)(y)
+
+    y1 = Conv1D(512, 5, border_mode='same')(embedding_sequences_conv)
+    y1 = LeakyReLU(alpha=0.1)(y1)
+
+    y2 = Conv1D(512, 3, border_mode='same')(embedding_sequences_conv)
+    y2 = LeakyReLU(alpha=0.1)(y2)
+
+    y3 = Conv1D(512, 4, border_mode='same')(embedding_sequences_conv)
+    y3 = LeakyReLU(alpha=0.1)(y3)
+
+    y4 = Conv1D(512, 7, border_mode='same')(embedding_sequences_conv)
+    y4 = LeakyReLU(alpha=0.1)(y4)
+
+    y = merge([y1, y2, y3, y4], mode='concat', concat_axis=concat_axis)
     y = GlobalMaxPooling1D()(y)
 
     m = merge([x, y], mode='concat', concat_axis=concat_axis)
 
-    #x = Dense(1024, activation='relu')(m)
-    #x = Dropout(0.5)(x)
-    preds = Dense(3, activation='softmax')(m)
+    x = Dense(512, activation='relu')(m)
+    x = Dropout(0.5)(x)
+    preds = Dense(3, activation='softmax')(x)
 
     model = Model([sequence_input_lstm, sequence_input_conv], preds)
     return model
 
 if __name__ == '__main__':
     train_keras_model_cv(gen_model, 'conv_lstm/conv_lstm-model', max_nb_words=MAX_NB_WORDS,
-                         max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
+                         max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=5,
                          nb_epoch=50)
 

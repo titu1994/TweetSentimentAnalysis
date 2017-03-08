@@ -2,7 +2,8 @@ import numpy as np
 import os
 
 from keras.layers import Dense, Input, Dropout
-from keras.layers import Conv1D, MaxPooling1D, Embedding, GlobalMaxPooling1D
+from keras.layers import Embedding, GRU
+from keras.callbacks import ModelCheckpoint
 from keras.models import Model
 
 from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
@@ -23,8 +24,7 @@ data, word_index = prepare_tokenized_data(texts, MAX_NB_WORDS, MAX_SEQUENCE_LENG
 # prepare embedding matrix
 nb_words = min(MAX_NB_WORDS, len(word_index))
 embedding_matrix = load_embedding_matrix(EMBEDDING_DIR + "/" + EMBEDDING_TYPE,
-                                          word_index, MAX_NB_WORDS, EMBEDDING_DIM)
-
+                                         word_index, MAX_NB_WORDS, EMBEDDING_DIM)
 
 def gen_model():
     # load pre-trained word embeddings into an Embedding layer
@@ -33,13 +33,12 @@ def gen_model():
                                 EMBEDDING_DIM,
                                 weights=[embedding_matrix],
                                 input_length=MAX_SEQUENCE_LENGTH,
-                                trainable=False, mask_zero=False)
+                                trainable=False, mask_zero=True)
 
-    # train a 1D convnet with global maxpooling
+    # train a Gated Recurrent Unit network followed by Fully Connected layers
     sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
     embedded_sequences = embedding_layer(sequence_input)
-    x = Conv1D(512, 5, activation='relu', border_mode='same', init='he_uniform')(embedded_sequences)
-    x = GlobalMaxPooling1D()(x)
+    x = GRU(512, dropout_W=0.1, dropout_U=0.1, return_sequences=False)(embedded_sequences)
     x = Dense(1024, activation='relu')(x)
     x = Dropout(0.5)(x)
     preds = Dense(3, activation='softmax')(x)
@@ -48,6 +47,6 @@ def gen_model():
     return model
 
 if __name__ == '__main__':
-    train_keras_model_cv(gen_model, 'conv/conv-model', max_nb_words=MAX_NB_WORDS,
-                         max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
+    train_keras_model_cv(gen_model, 'gru/gru-model', max_nb_words=MAX_NB_WORDS,
+                         max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=5,
                          nb_epoch=50)

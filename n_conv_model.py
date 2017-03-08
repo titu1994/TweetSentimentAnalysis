@@ -3,13 +3,14 @@ import os
 
 from keras.utils.np_utils import to_categorical
 from keras.layers import Dense, Input, Dropout, merge
-from keras.layers import Conv1D, MaxPooling1D, Embedding, GlobalMaxPooling1D
+from keras.regularizers import l2
+from keras.layers import Conv1D, MaxPooling1D, Embedding, GlobalMaxPooling1D, Flatten
 from keras.callbacks import ModelCheckpoint
 from keras.models import Model
 
 from keras import backend as K
 
-from utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
+from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
 
 MAX_NB_WORDS = 16000
 MAX_SEQUENCE_LENGTH = 140
@@ -59,8 +60,9 @@ def gen_model():
     m = merge([x, y, z, w], mode='concat', concat_axis=concat_axis)
 
     x = GlobalMaxPooling1D()(m)
+    #x = Flatten()(m)
 
-    x = Dense(1024, activation='relu')(x)
+    x = Dense(512, activation='relu')(x)
     x = Dropout(0.5)(x)
 
     preds = Dense(3, activation='softmax')(x)
