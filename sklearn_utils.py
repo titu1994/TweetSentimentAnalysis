@@ -5,12 +5,18 @@ import time
 import os
 import pickle
 
+np.random.seed(1000)
+
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import f1_score
 
 train_obama_path = "data/obama_csv.csv"
 train_romney_path = "data/romney_csv.csv"
+
+train_obama_full_path = "data/full_obama_csv.csv"
+train_romney_full_path = "data/full_romney_csv.csv"
+
 
 if not os.path.exists('models/xgboost/'):
     os.makedirs('models/xgboost/')
@@ -22,58 +28,19 @@ if not os.path.exists('models/svm/'):
     os.makedirs('models/svm/')
 
 
-def load_obama():
-    obama_df = pd.read_csv(train_obama_path, sep='\t', encoding='latin1')
+def load_both(use_full_data=False):
+    if use_full_data:
+        obama_df = pd.read_csv(train_obama_full_path, sep='\t', encoding='latin1')
+    else:
+        obama_df = pd.read_csv(train_obama_path, sep='\t', encoding='latin1')
     # Remove rows who have no class label attached, can hand label later
     obama_df = obama_df[pd.notnull(obama_df['label'])]
     obama_df['label'] = obama_df['label'].astype(np.int)
 
-    texts = []  # list of text samples
-    labels_index = {-1: 0,
-                    0: 1,
-                    1: 2}  # dictionary mapping label name to numeric id
-    labels = []  # list of label ids
-
-    obama_df = obama_df[obama_df['label'] != 2] # drop all rows with class = 2
-
-    nb_rows = len(obama_df)
-    for i in range(nb_rows):
-        row = obama_df.iloc[i]
-        texts.append(str(row['tweet']))
-        labels.append(labels_index[int(row['label'])])
-
-    return texts, labels, labels_index
-
-
-def load_romney():
-    romney_df = pd.read_csv(train_romney_path, sep='\t', encoding='latin1')
-    # Remove rows who have no class label attached, can hand label later
-    romney_df = romney_df[pd.notnull(romney_df['label'])]
-    romney_df['label'] = romney_df['label'].astype(np.int)
-
-    texts = []  # list of text samples
-    labels_index = {-1: 0,
-                    0: 1,
-                    1: 2}  # dictionary mapping label name to numeric id
-    labels = []  # list of label ids
-
-    romney_df = romney_df[romney_df['label'] != 2]  # drop all rows with class = 2
-
-    nb_rows = len(romney_df)
-    for i in range(nb_rows):
-        row = romney_df.iloc[i]
-        texts.append(str(row['tweet']))
-        labels.append(labels_index[int(row['label'])])
-
-    return texts, labels, labels_index
-
-def load_both():
-    obama_df = pd.read_csv(train_obama_path, sep='\t', encoding='latin1')
-    # Remove rows who have no class label attached, can hand label later
-    obama_df = obama_df[pd.notnull(obama_df['label'])]
-    obama_df['label'] = obama_df['label'].astype(np.int)
-
-    romney_df = pd.read_csv(train_romney_path, sep='\t', encoding='latin1')
+    if use_full_data:
+        romney_df = pd.read_csv(train_romney_full_path, sep='\t', encoding='latin1')
+    else:
+        romney_df = pd.read_csv(train_romney_path, sep='\t', encoding='latin1')
     # Remove rows who have no class label attached, can hand label later
     romney_df = romney_df[pd.notnull(romney_df['label'])]
     romney_df['label'] = romney_df['label'].astype(np.int)
@@ -105,7 +72,7 @@ def load_both():
     return texts, labels, labels_index
 
 
-def tokenize(texts, stop_words=None):
+def tokenize(texts):
     if os.path.exists('data/vectorizer.pkl'):
         with open('data/vectorizer.pkl', 'rb') as f:
             tfidf_vect = pickle.load(f)
@@ -136,11 +103,10 @@ def tfidf(x_counts):
     return x_tfidf
 
 
-def train_sklearn_model_cv(model_gen, model_fn, k_folds=3, seed=1000):
-    np.random.seed(seed)
+def train_sklearn_model_cv(model_gen, model_fn, use_full_data=False, k_folds=3, seed=1000):
 
     print('Loading data')
-    texts, labels, label_map = load_both()
+    texts, labels, label_map = load_both(use_full_data)
     print('Tokenizing texts')
     x_counts = tokenize(texts)
     print('Finished tokenizing texts')

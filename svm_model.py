@@ -54,6 +54,6 @@ def param_search():
 
 
 if __name__ == '__main__':
-    train_sklearn_model_cv(model_gen, 'svm/svm-model', k_folds=100)
+    train_sklearn_model_cv(model_gen, 'svm/svm-model', k_folds=100, use_full_data=False)
 
     #param_search()

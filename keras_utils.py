@@ -2,8 +2,9 @@ import pandas as pd
 import numpy as np
 import os
 import pickle
+np.random.seed(1000)
 
-from sklearn_utils import load_obama, load_romney, load_both
+from sklearn_utils import load_both
 from sklearn.model_selection import StratifiedKFold
 
 from keras.preprocessing.text import Tokenizer
@@ -32,7 +33,8 @@ if not os.path.exists('models/n_conv/'):
 train_obama_path = "data/obama_csv.csv"
 train_romney_path = "data/romney_csv.csv"
 
-
+train_obama_full_path = "data/full_obama_csv.csv"
+train_romney_full_path = "data/full_romney_csv.csv"
 
 def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_dim, print_error_words=True):
     if not os.path.exists('data/embedding_matrix index length %d max words %d embedding dim %d.npy' % (len(word_index),
@@ -113,8 +115,7 @@ def prepare_tokenized_data(texts, max_nb_words, max_sequence_length):
     return (data, word_index)
 
 
-def prepare_validation_set(data, labels, validation_split=0.1, seed=1000):
-    np.random.seed(seed)
+def prepare_validation_set(data, labels, validation_split=0.1):
 
     indices = np.arange(data.shape[0])
     np.random.shuffle(indices)
@@ -130,10 +131,10 @@ def prepare_validation_set(data, labels, validation_split=0.1, seed=1000):
     return (x_train, y_train, x_val, y_val)
 
 
-def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_length=140, k_folds=3,
-                         nb_epoch=40, batch_size=100, seed=1000):
+def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_length=140, use_full_data=False,
+                         k_folds=3, nb_epoch=40, batch_size=100, seed=1000):
 
-    texts, labels, label_map = load_both()
+    texts, labels, label_map = load_both(use_full_data)
     data, word_index = prepare_tokenized_data(texts, max_nb_words, max_sequence_length)
 
     skf = StratifiedKFold(k_folds, shuffle=True, random_state=seed)
