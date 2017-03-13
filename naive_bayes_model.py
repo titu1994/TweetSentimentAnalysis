@@ -1,5 +1,7 @@
 from sklearn_utils import *
 import numpy as np
+import joblib
+import glob
 
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import GridSearchCV
@@ -10,9 +12,11 @@ def model_gen():
     model = MultinomialNB(alpha=0.7)
     return model
 
+
 def scoring(estimator, X, y):
     preds = estimator.predict(X)
     return f1_score(y, preds, average='micro')
+
 
 def param_search():
     params = {'alpha' : np.linspace(0.6, 0.8, num=100)}
@@ -45,7 +49,26 @@ def param_search():
               % (mean, std * 2, params))
 
 
-if __name__ == '__main__':
-    train_sklearn_model_cv(model_gen, 'mnb/mnb-model', k_folds=100, use_full_data=False)
+def write_predictions(model_dir='mnb/'):
+    basepath = 'models/' + model_dir
+    path = basepath + "*.pkl"
 
+    data, labels = prepare_data()
+    files = glob.glob(path)
+
+    nb_models = len(files)
+
+    model_predictions = np.zeros((nb_models, data.shape[0], 3))
+
+    for i, fn in enumerate(files):
+        model = joblib.load(fn) # type: MultinomialNB
+        model_predictions[i, :, :] = model.predict_proba(data)
+
+        print('Finished prediction for model %d' % (i + 1))
+
+    np.save(basepath + "mnb_predictions.npy", model_predictions)
+
+if __name__ == '__main__':
+    #train_sklearn_model_cv(model_gen, 'mnb/mnb-model', k_folds=100, use_full_data=False)
     #param_search()
+    write_predictions()

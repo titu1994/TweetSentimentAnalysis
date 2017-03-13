@@ -12,24 +12,6 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.utils.np_utils import to_categorical
 
-if not os.path.exists('models/'):
-    os.makedirs('models/')
-
-if not os.path.exists('models/conv/'):
-    os.makedirs('models/conv/')
-
-if not os.path.exists('models/conv_lstm/'):
-    os.makedirs('models/conv_lstm/')
-
-if not os.path.exists('models/lstm/'):
-    os.makedirs('models/lstm/')
-
-if not os.path.exists('models/gru/'):
-    os.makedirs('models/gru/')
-
-if not os.path.exists('models/n_conv/'):
-    os.makedirs('models/n_conv/')
-
 train_obama_path = "data/obama_csv.csv"
 train_romney_path = "data/romney_csv.csv"
 

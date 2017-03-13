@@ -1,5 +1,7 @@
 from sklearn_utils import *
 import numpy as np
+import glob
+import joblib
 import multiprocessing
 
 from nbsvm import NBSVM
@@ -53,7 +55,26 @@ def param_search():
               % (mean, std * 2, params))
 
 
-if __name__ == '__main__':
-    train_sklearn_model_cv(model_gen, 'svm/svm-model', k_folds=100, use_full_data=False)
+def write_predictions(model_dir='svm/'):
+    basepath = 'models/' + model_dir
+    path = basepath + "*.pkl"
 
+    data, labels = prepare_data()
+    files = glob.glob(path)
+
+    nb_models = len(files)
+
+    model_predictions = np.zeros((nb_models, data.shape[0], 3))
+
+    for i, fn in enumerate(files):
+        model = joblib.load(fn) # type: NBSVM
+
+        model_predictions[i, :, :] = model._predict_proba_lr(data)
+        print('Finished prediction for model %d' % (i + 1))
+
+    np.save(basepath + "svm_predictions.npy", model_predictions)
+
+if __name__ == '__main__':
+    #train_sklearn_model_cv(model_gen, 'svm/svm-model', k_folds=100, use_full_data=False)
     #param_search()
+    write_predictions()

@@ -5,8 +5,6 @@ import time
 import os
 import pickle
 
-import xgboost as xgb
-
 np.random.seed(1000)
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -19,16 +17,16 @@ train_romney_path = "data/romney_csv.csv"
 train_obama_full_path = "data/full_obama_csv.csv"
 train_romney_full_path = "data/full_romney_csv.csv"
 
+if not os.path.exists('models/'):
+    os.makedirs('models/')
 
-if not os.path.exists('models/xgboost/'):
-    os.makedirs('models/xgboost/')
+subdirs = ['conv/', 'conv_lstm/', 'lstm/', 'gru/', 'n_conv/', 'xgboost/', 'mnb/', 'svm/']
 
-if not os.path.exists('models/mnb/'):
-    os.makedirs('models/mnb/')
+for sub in subdirs:
+    path = 'models/' + sub
 
-if not os.path.exists('models/svm/'):
-    os.makedirs('models/svm/')
-
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 def load_both(use_full_data=False):
     if use_full_data:
@@ -106,15 +104,7 @@ def tfidf(x_counts):
 
 
 def train_sklearn_model_cv(model_gen, model_fn, use_full_data=False, k_folds=3, seed=1000):
-
-    print('Loading data')
-    texts, labels, label_map = load_both(use_full_data)
-    print('Tokenizing texts')
-    x_counts = tokenize(texts)
-    print('Finished tokenizing texts')
-    data = tfidf(x_counts)
-    print('Finished computing TF-IDF')
-    print('-' * 80)
+    data, labels = prepare_data(use_full_data)
 
     skf = StratifiedKFold(k_folds, shuffle=True, random_state=seed)
 
@@ -174,6 +164,18 @@ def train_sklearn_model_cv(model_gen, model_fn, use_full_data=False, k_folds=3, 
 
     with open('models/%s-scores.txt' % (model_fn), 'w') as f:
         f.write(str(fbeta_scores))
+
+
+def prepare_data(use_full_data=False):
+    print('Loading data')
+    texts, labels, label_map = load_both(use_full_data)
+    print('Tokenizing texts')
+    x_counts = tokenize(texts)
+    print('Finished tokenizing texts')
+    data = tfidf(x_counts)
+    print('Finished computing TF-IDF')
+    print('-' * 80)
+    return data, labels
 
 
 if __name__ == '__main__':

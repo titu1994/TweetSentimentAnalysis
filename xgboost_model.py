@@ -4,6 +4,7 @@ import numpy as np
 np.random.seed(1000)
 import joblib
 import time
+import glob
 
 import xgboost as xgb
 from xgboost import Booster
@@ -25,14 +26,7 @@ def generate_cv_dmatrix(data, labels, k_folds=10, seed=1000):
 
 
 def train_xgboost(iters=100, k_folds=10, use_full_data=False, seed=1000):
-    print('Loading data')
-    texts, labels, label_map = load_both(use_full_data)
-    print('Tokenizing texts')
-    x_counts = tokenize(texts)
-    print('Finished tokenizing texts')
-    data = tfidf(x_counts)
-    print('Finished computing TF-IDF')
-    print('-' * 80)
+    data, labels = prepare_data(use_full_data)
 
     params = {
         'booster': 'gblinear',
@@ -87,38 +81,28 @@ def scoring(estimator, X, y):
     return f1_score(y, preds, average='micro')
 
 
-def param_search():
-    params = {'alpha' : np.linspace(0.6, 0.8, num=100)}
-    print('Params : ', params)
+def write_predictions(model_dir='xgboost/'):
+    basepath = 'models/' + model_dir
+    path = basepath + "*.pkl"
 
-    model = xgb.XGBClassifier(max_depth=4)
-    g = GridSearchCV(model, param_grid=params, scoring=scoring,
-                     n_jobs=-1, cv=100, verbose=1)
+    data, labels = prepare_data()
+    nb_features = data.shape[0]
 
-    np.random.seed(1000)
-    print('Loading data')
-    texts, labels, label_map = load_both()
-    print('Tokenizing texts')
-    x_counts = tokenize(texts)
-    print('Finished tokenizing texts')
-    data = tfidf(x_counts)
-    print('Finished computing TF-IDF')
+    data = xgb.DMatrix(data, labels)
+    files = glob.glob(path)
 
-    g.fit(data, labels)
-    print("Best parameters set found on development set:")
-    print()
-    print(g.best_params_)
-    print()
-    print("Grid scores on development set:")
-    print()
-    means = g.cv_results_['mean_test_score']
-    stds = g.cv_results_['std_test_score']
-    for mean, std, params in zip(means, stds, g.cv_results_['params']):
-        print("%0.6f (+/-%0.06f) for %r"
-              % (mean, std * 2, params))
+    nb_models = len(files)
 
+    model_predictions = np.zeros((nb_models, nb_features, 3))
+
+    for i, fn in enumerate(files):
+        model = joblib.load(fn) # type: Booster
+        model_predictions[i, :, :] = model.predict(data)
+        print('Finished prediction for model %d' % (i + 1))
+
+    np.save(basepath + "xgboost_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    train_xgboost(iters=100, k_folds=100)
-
+    #train_xgboost(iters=100, k_folds=100)
     #param_search()
+    write_predictions()
