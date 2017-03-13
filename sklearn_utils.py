@@ -5,6 +5,8 @@ import time
 import os
 import pickle
 
+import xgboost as xgb
+
 np.random.seed(1000)
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -118,7 +120,7 @@ def train_sklearn_model_cv(model_gen, model_fn, use_full_data=False, k_folds=3, 
 
     fbeta_scores = []
 
-    for i, (train_idx, test_idx) in enumerate(skf.split(texts, labels)):
+    for i, (train_idx, test_idx) in enumerate(skf.split(data, labels)):
         x_train, y_train = data[train_idx, :], labels[train_idx]
         x_test, y_test = data[test_idx, :], labels[test_idx]
 
