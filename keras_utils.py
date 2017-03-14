@@ -48,7 +48,7 @@ def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_di
         nb_words = min(max_nb_words, len(word_index))
         embedding_matrix = np.zeros((nb_words, embedding_dim))
         for word, i in word_index.items():
-            if i >= max_nb_words:
+            if i >= nb_words:
                 continue
             embedding_vector = embeddings_index.get(word)
             if embedding_vector is not None:
@@ -73,7 +73,45 @@ def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_di
     return embedding_matrix
 
 
-def prepare_tokenized_data(texts, max_nb_words, max_sequence_length):
+def create_ngram_set(input_list, ngram_value=2):
+    """
+    Extract a set of n-grams from a list of integers.
+    >>> create_ngram_set([1, 4, 9, 4, 1, 4], ngram_value=2)
+    {(4, 9), (4, 1), (1, 4), (9, 4)}
+    >>> create_ngram_set([1, 4, 9, 4, 1, 4], ngram_value=3)
+    [(1, 4, 9), (4, 9, 4), (9, 4, 1), (4, 1, 4)]
+    """
+    return set(zip(*[input_list[i:] for i in range(ngram_value)]))
+
+
+def add_ngram(sequences, token_indice, ngram_range=2):
+    """
+    Augment the input list of list (sequences) by appending n-grams values.
+    Example: adding bi-gram
+    >>> sequences = [[1, 3, 4, 5], [1, 3, 7, 9, 2]]
+    >>> token_indice = {(1, 3): 1337, (9, 2): 42, (4, 5): 2017}
+    >>> add_ngram(sequences, token_indice, ngram_range=2)
+    [[1, 3, 4, 5, 1337, 2017], [1, 3, 7, 9, 2, 1337, 42]]
+    Example: adding tri-gram
+    >>> sequences = [[1, 3, 4, 5], [1, 3, 7, 9, 2]]
+    >>> token_indice = {(1, 3): 1337, (9, 2): 42, (4, 5): 2017, (7, 9, 2): 2018}
+    >>> add_ngram(sequences, token_indice, ngram_range=3)
+    [[1, 3, 4, 5, 1337], [1, 3, 7, 9, 2, 1337, 2018]]
+    """
+    new_sequences = []
+    for input_list in sequences:
+        new_list = input_list[:]
+        for i in range(len(new_list) - ngram_range + 1):
+            for ngram_value in range(2, ngram_range + 1):
+                ngram = tuple(new_list[i:i + ngram_value])
+                if ngram in token_indice:
+                    new_list.append(token_indice[ngram])
+        new_sequences.append(new_list)
+
+    return new_sequences
+
+
+def prepare_tokenized_data(texts, max_nb_words, max_sequence_length, ngram_range=2):
     if not os.path.exists('data/tokenizer.pkl'):
         tokenizer = Tokenizer(nb_words=max_nb_words)
         tokenizer.fit_on_texts(texts)
@@ -88,11 +126,33 @@ def prepare_tokenized_data(texts, max_nb_words, max_sequence_length):
             print('Loaded tokenizer.pkl')
 
     sequences = tokenizer.texts_to_sequences(texts)
-
     word_index = tokenizer.word_index
-    print('Found %s unique tokens.' % len(word_index))
+    print('Found %s unique 1-gram tokens.' % len(word_index))
+
+    ngram_set = set()
+    for input_list in sequences:
+        for i in range(2, ngram_range + 1):
+            set_of_ngram = create_ngram_set(input_list, ngram_value=i)
+            ngram_set.update(set_of_ngram)
+
+    # Dictionary mapping n-gram token to a unique integer.
+    # Integer values are greater than max_features in order
+    # to avoid collision with existing features.
+    start_index = max_nb_words + 1
+    token_indice = {v: k + start_index for k, v in enumerate(ngram_set)}
+    indice_token = {token_indice[k]: k for k in token_indice}
+    word_index.update(token_indice)
+
+    max_features = np.max(list(indice_token.keys())) + 1
+    print('Now there are:', max_features, 'features')
+
+    # Augmenting X_train and X_test with n-grams features
+    sequences = add_ngram(sequences, token_indice, ngram_range)
+    print('Average sequence length: {}'.format(np.mean(list(map(len, sequences)), dtype=int)))
+    print('Max sequence length: {}'.format(np.max(list(map(len, sequences)))))
 
     data = pad_sequences(sequences, maxlen=max_sequence_length)
+
 
     return (data, word_index)
 
@@ -116,9 +176,9 @@ def prepare_validation_set(data, labels, validation_split=0.1):
 def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_length=140, use_full_data=False,
                          k_folds=3, nb_epoch=40, batch_size=100, seed=1000):
 
-    texts, labels, label_map = load_both(use_full_data)
-    data, word_index = prepare_tokenized_data(texts, max_nb_words, max_sequence_length)
+    data, labels, texts, word_index = prepare_data(max_nb_words, max_sequence_length, use_full_data)
 
+    print("Dataset :", data.shape)
     skf = StratifiedKFold(k_folds, shuffle=True, random_state=seed)
 
     fbeta_scores = []
@@ -138,7 +198,7 @@ def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_l
                                  save_best_only=True, mode='max')
 
         reduce_lr = ReduceLROnPlateau(monitor='val_fbeta_score', patience=5, mode='max',
-                                      factor=0.5, cooldown=5, min_lr=1e-6, verbose=2)
+                                      factor=0.8, cooldown=5, min_lr=1e-6, verbose=2)
 
         model.fit(x_train, y_train_categorical, validation_data=(x_test, y_test_categorical),
                   callbacks=[model_checkpoint, reduce_lr], nb_epoch=nb_epoch, batch_size=batch_size)
@@ -156,6 +216,16 @@ def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_l
 
     with open('models/%s-scores.txt' % (model_fn), 'w') as f:
         f.write(str(fbeta_scores))
+
+
+def prepare_data(max_nb_words=16000, max_sequence_length=140, use_full_data=False):
+    print('Loading data')
+    texts, labels, label_map = load_both(use_full_data)
+    print('Tokenizing texts')
+    data, word_index = prepare_tokenized_data(texts, max_nb_words, max_sequence_length)
+    print('Finished tokenizing texts')
+    print('-' * 80)
+    return data, labels, texts, word_index
 
 if __name__ == '__main__':
     pass

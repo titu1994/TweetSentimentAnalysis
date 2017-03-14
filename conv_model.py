@@ -1,15 +1,16 @@
 import numpy as np
 import os
+import glob
 
 from keras.layers import Dense, Input, Dropout
 from keras.layers import Conv1D, MaxPooling1D, Embedding, GlobalMaxPooling1D
 from keras.models import Model
 
-from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
+from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv, prepare_data
 
 
-MAX_NB_WORDS = 16000
-MAX_SEQUENCE_LENGTH = 140
+MAX_NB_WORDS = 95000
+MAX_SEQUENCE_LENGTH = 80
 VALIDATION_SPLIT = 0.1
 EMBEDDING_DIM = 300
 
@@ -47,7 +48,30 @@ def gen_model():
     model = Model(sequence_input, preds)
     return model
 
+
+def write_predictions(model_dir='conv/'):
+    basepath = 'models/' + model_dir
+    path = basepath + "*.h5"
+
+    data, labels, texts, word_index = prepare_data()
+    files = glob.glob(path)
+
+    nb_models = len(files)
+    model_predictions = np.zeros((nb_models, data.shape[0], 3))
+
+    model = gen_model()
+
+    for i, fn in enumerate(files):
+        model.load_weights(fn)
+        model_predictions[i, :, :] = model.predict(data, batch_size=128)
+
+        print('Finished prediction for model %d' % (i + 1))
+
+    np.save(basepath + "conv_predictions.npy", model_predictions)
+
 if __name__ == '__main__':
     train_keras_model_cv(gen_model, 'conv/conv-model', max_nb_words=MAX_NB_WORDS,
                          max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
                          nb_epoch=50)
+
+    #write_predictions()

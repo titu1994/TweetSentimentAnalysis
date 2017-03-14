@@ -12,8 +12,8 @@ from keras import backend as K
 
 from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
 
-MAX_NB_WORDS = 16000
-MAX_SEQUENCE_LENGTH = 140
+MAX_NB_WORDS = 95000
+MAX_SEQUENCE_LENGTH = 80
 VALIDATION_SPLIT = 0.1
 EMBEDDING_DIM = 300
 
