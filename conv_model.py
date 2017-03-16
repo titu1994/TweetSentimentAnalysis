@@ -2,9 +2,11 @@ import numpy as np
 import os
 import glob
 
-from keras.layers import Dense, Input, Dropout
+from keras.layers import Dense, Input, Dropout, BatchNormalization
+from keras.layers.advanced_activations import PReLU
 from keras.layers import Conv1D, MaxPooling1D, Embedding, GlobalMaxPooling1D
 from keras.models import Model
+from keras import backend as K
 
 from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv, prepare_data
 
@@ -28,6 +30,7 @@ embedding_matrix = load_embedding_matrix(EMBEDDING_DIR + "/" + EMBEDDING_TYPE,
 
 
 def gen_model():
+    channel_axis = 1 if K.image_dim_ordering() == 'th' else -1
     # load pre-trained word embeddings into an Embedding layer
     # note that we set trainable = False so as to keep the embeddings fixed
     embedding_layer = Embedding(nb_words,

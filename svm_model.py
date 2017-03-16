@@ -4,14 +4,14 @@ import glob
 import joblib
 import multiprocessing
 
-from nbsvm import NBSVM
+from sklearn.svm import LinearSVC
 
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import f1_score
 
 
 def model_gen():
-    model = NBSVM(C=1.09, beta=0.5)
+    model = LinearSVC(C=0.1)
     return model
 
 def scoring(estimator, X, y):
@@ -20,11 +20,10 @@ def scoring(estimator, X, y):
 
 def param_search():
     params = {'C' : np.linspace(0.09, 0.11, num=21),
-              'beta' : [0.25, 0.3, 0.35, 0.4, 0.45, 0.5],
               }
     print('Params : ', params)
 
-    model = NBSVM()
+    model = LinearSVC()
 
     # use 1 less core than available, prevents locking up of laptop
     n_cores = multiprocessing.cpu_count() - 1
@@ -67,7 +66,7 @@ def write_predictions(model_dir='svm/'):
     model_predictions = np.zeros((nb_models, data.shape[0], 3))
 
     for i, fn in enumerate(files):
-        model = joblib.load(fn) # type: NBSVM
+        model = joblib.load(fn) # type: LinearSVC
 
         model_predictions[i, :, :] = model._predict_proba_lr(data)
         print('Finished prediction for model %d' % (i + 1))

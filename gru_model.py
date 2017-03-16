@@ -1,10 +1,12 @@
 import numpy as np
 import os
 
-from keras.layers import Dense, Input, Dropout
+from keras.layers import Dense, Input, Dropout, BatchNormalization
+from keras.layers.advanced_activations import PReLU
 from keras.layers import Embedding, GRU
 from keras.callbacks import ModelCheckpoint
 from keras.models import Model
+from keras import backend as K
 
 from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
 
@@ -27,6 +29,7 @@ embedding_matrix = load_embedding_matrix(EMBEDDING_DIR + "/" + EMBEDDING_TYPE,
                                          word_index, MAX_NB_WORDS, EMBEDDING_DIM)
 
 def gen_model():
+    channel_axis = 1 if K.image_dim_ordering() == 'th' else -1
     # load pre-trained word embeddings into an Embedding layer
     # note that we set trainable = False so as to keep the embeddings fixed
     embedding_layer = Embedding(nb_words,
@@ -39,8 +42,14 @@ def gen_model():
     sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
     embedded_sequences = embedding_layer(sequence_input)
     x = GRU(512, dropout_W=0.1, dropout_U=0.1, return_sequences=False)(embedded_sequences)
-    x = Dense(1024, activation='relu')(x)
-    x = Dropout(0.5)(x)
+    x = Dense(512, activation='linear')(x)
+    x = PReLU()(x)
+    x = Dropout(0.2)(x)
+    x = BatchNormalization(axis=channel_axis)(x)
+    x = Dense(512, activation='linear')(x)
+    x = PReLU()(x)
+    x = Dropout(0.2)(x)
+    x = BatchNormalization(axis=channel_axis)(x)
     preds = Dense(3, activation='softmax')(x)
 
     model = Model(sequence_input, preds)
