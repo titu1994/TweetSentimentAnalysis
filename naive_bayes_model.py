@@ -5,7 +5,7 @@ import glob
 
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, confusion_matrix
 
 
 def model_gen():
@@ -69,6 +69,7 @@ def write_predictions(model_dir='mnb/'):
     np.save(basepath + "mnb_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    train_sklearn_model_cv(model_gen, 'mnb/mnb-model', k_folds=100, use_full_data=False)
+    #train_sklearn_model_cv(model_gen, 'mnb/mnb-model', k_folds=100, use_full_data=False)
+    train_full_model(model_gen, 'mnb/mnb-model', use_full_data=False)
     #param_search()
     #write_predictions()

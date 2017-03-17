@@ -20,7 +20,8 @@ train_romney_full_path = "data/full_romney_csv.csv"
 if not os.path.exists('models/'):
     os.makedirs('models/')
 
-subdirs = ['conv/', 'conv_lstm/', 'lstm/', 'gru/', 'n_conv/', 'xgboost/', 'mnb/', 'svm/', 'nbsvm/']
+subdirs = ['conv/', 'conv_lstm/', 'lstm/', 'gru/', 'n_conv/', 'xgboost/', 'mnb/', 'svm/', 'nbsvm/', 'logistic/',
+           'sgd/']
 
 for sub in subdirs:
     path = 'models/' + sub
@@ -166,15 +167,61 @@ def train_sklearn_model_cv(model_gen, model_fn, use_full_data=False, k_folds=3, 
         f.write(str(fbeta_scores))
 
 
-def prepare_data(use_full_data=False):
-    print('Loading data')
+def train_full_model(model_gen, model_fn, use_full_data=False, seed=1000, data=None, labels=None):
+    np.random.seed(seed)
+    if data is None or labels is None:
+        data, labels = prepare_data(use_full_data)
+
+    print('\nBegin training full classifier')
+
+    model = model_gen()
+
+    t1 = time.time()
+    try:
+        model.fit(data, labels)
+    except TypeError:
+        # Model does not support sparce matrix input, convert to dense matrix input
+        data = data.toarray()
+        model.fit(data, labels)
+
+    t2 = time.time()
+
+    print('Classifier training time : %0.3f seconds.' % (t2 - t1))
+
+    print('Begin testing classifier')
+
+    t1 = time.time()
+    try:
+        preds = model.predict(data)
+    except TypeError:
+        # Model does not support sparce matrix input, convert to dense matrix input
+        x_test = data.toarray()
+        preds = model.predict(x_test)
+
+    t2 = time.time()
+
+    print('Classifier finished predicting in %0.3f seconds.' % (t2 - t1))
+
+    f1score = f1_score(labels, preds, average='micro')
+    print('\nTraining F1 Scores of Estimator: %0.4f' % (f1score))
+
+    print('Saving model')
+    joblib.dump(model, 'models/%s-final.pkl' % (model_fn))
+
+    print('Saved full model')
+    print()
+
+
+def prepare_data(use_full_data=False, verbose=True):
+    if verbose: print('Loading data')
     texts, labels, label_map = load_both(use_full_data)
-    print('Tokenizing texts')
+    if verbose: print('Tokenizing texts')
     x_counts = tokenize(texts)
-    print('Finished tokenizing texts')
+    if verbose: print('Finished tokenizing texts')
     data = tfidf(x_counts)
-    print('Finished computing TF-IDF')
-    print('-' * 80)
+    if verbose:
+        print('Finished computing TF-IDF')
+        print('-' * 80)
     return data, labels
 
 

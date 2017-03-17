@@ -218,6 +218,35 @@ def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_l
         f.write(str(fbeta_scores))
 
 
+def train_full_model(model_gen, model_fn, max_nb_words=16000, max_sequence_length=140, use_full_data=False,
+                     nb_epoch=40, batch_size=100, seed=1000):
+
+    np.random.seed(seed)
+    data, labels, texts, word_index = prepare_data(max_nb_words, max_sequence_length, use_full_data)
+
+    labels_categorical = to_categorical(np.asarray(labels))
+
+    model = model_gen()
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', 'fbeta_score'])
+
+    model_checkpoint = ModelCheckpoint('models/%s-final.h5' % (model_fn), monitor='val_fbeta_score', verbose=2,
+                                       save_weights_only=True,
+                                       save_best_only=True, mode='max')
+
+    reduce_lr = ReduceLROnPlateau(monitor='val_fbeta_score', patience=5, mode='max',
+                                  factor=0.8, cooldown=5, min_lr=1e-6, verbose=2)
+
+    model.fit(data, labels_categorical, validation_data=(data, labels_categorical),
+              callbacks=[model_checkpoint, reduce_lr], nb_epoch=nb_epoch, batch_size=batch_size)
+
+    print('Finished Training model')
+
+    model.load_weights('models/%s-final.h5' % (model_fn))
+
+    scores = model.evaluate(texts, labels_categorical, batch_size=batch_size)
+    print('\nTraining F1 Scores of Cross Validation: %0.4f' % (scores[-1]))
+
+
 def prepare_data(max_nb_words=16000, max_sequence_length=140, use_full_data=False):
     print('Loading data')
     texts, labels, label_map = load_both(use_full_data)
