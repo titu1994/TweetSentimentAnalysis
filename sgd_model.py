@@ -14,11 +14,6 @@ def proba_model_gen():
     model = SGDClassifier(alpha=0.0001, n_iter=n_iter, loss="log")
     return model
 
-def model_gen():
-    n_iter = np.ceil((10 ** 6) / 10000) # 100 iterations
-    model = SGDClassifier(alpha=0.0001, n_iter=n_iter)
-    return model
-
 def scoring(estimator, X, y):
     preds = estimator.predict(X)
     return f1_score(y, preds, average='micro')
@@ -62,7 +57,7 @@ def param_search():
 
 
 def write_predictions(model_dir='sgd/'):
-    basepath = 'models/' + model_dir + 'sgd-model-'
+    basepath = 'models/' + model_dir
     path = basepath + "*.pkl"
 
     data, labels = prepare_data()
@@ -81,9 +76,7 @@ def write_predictions(model_dir='sgd/'):
     np.save(basepath + "sgd_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    train_sklearn_model_cv(proba_model_gen, 'sgd/sgd-model', k_folds=100, use_full_data=False)
-    train_full_model(proba_model_gen, 'sgd/sgd-model', use_full_data=False)
-    train_sklearn_model_cv(model_gen, 'sgd/sgd-predict-model', k_folds=100, use_full_data=False)
-    train_full_model(proba_model_gen, 'sgd/sgd-predict-model', use_full_data=False)
+    #train_sklearn_model_cv(proba_model_gen, 'sgd/sgd-proba_model', k_folds=100, use_full_data=False)
+    #train_full_model(proba_model_gen, 'sgd/sgd-proba_model', use_full_data=False)
     #param_search()
     write_predictions()

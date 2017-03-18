@@ -70,6 +70,5 @@ def write_predictions(model_dir='mnb/'):
 
 if __name__ == '__main__':
     #train_sklearn_model_cv(model_gen, 'mnb/mnb-model', k_folds=100, use_full_data=False)
-    train_full_model(model_gen, 'mnb/mnb-model', use_full_data=False)
     #param_search()
-    #write_predictions()
+    write_predictions()

@@ -17,11 +17,14 @@ train_romney_path = "data/romney_csv.csv"
 train_obama_full_path = "data/full_obama_csv.csv"
 train_romney_full_path = "data/full_romney_csv.csv"
 
+if not os.path.exists('stack_model/'):
+    os.makedirs('stack_model/')
+
 if not os.path.exists('models/'):
     os.makedirs('models/')
 
 subdirs = ['conv/', 'conv_lstm/', 'lstm/', 'n_conv/', 'xgboost/', 'mnb/', 'svm/', 'nbsvm/', 'logistic/',
-           'sgd/', 'stack/']
+           'sgd/']
 
 for sub in subdirs:
     path = 'models/' + sub

@@ -68,13 +68,13 @@ def write_predictions(model_dir='logistic/'):
     for i, fn in enumerate(files):
         model = joblib.load(fn) # type: LogisticRegression
 
-        model_predictions[i, :, :] = model._predict_proba_lr(data)
+        model_predictions[i, :, :] = model.predict_proba(data)
         print('Finished prediction for model %d' % (i + 1))
 
     np.save(basepath + "logistic_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    train_sklearn_model_cv(model_gen, 'logistic/logistic-model', k_folds=100, use_full_data=False)
-    train_full_model(model_gen, 'logistic/logistic-model', use_full_data=False)
+    #train_sklearn_model_cv(model_gen, 'logistic/logistic-model', k_folds=100, use_full_data=False)
+    #train_full_model(model_gen, 'logistic/logistic-model', use_full_data=False)
     #param_search()
     write_predictions()

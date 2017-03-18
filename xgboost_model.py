@@ -143,7 +143,6 @@ def write_predictions(model_dir='xgboost/'):
     np.save(basepath + "xgboost_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    train_xgboost(iters=1000, k_folds=100)
-    train_full_model(iters=1000)
+    #train_xgboost(iters=1000, k_folds=100)
     #param_search()
     write_predictions()
