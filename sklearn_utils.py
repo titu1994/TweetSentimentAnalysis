@@ -20,8 +20,8 @@ train_romney_full_path = "data/full_romney_csv.csv"
 if not os.path.exists('models/'):
     os.makedirs('models/')
 
-subdirs = ['conv/', 'conv_lstm/', 'lstm/', 'gru/', 'n_conv/', 'xgboost/', 'mnb/', 'svm/', 'nbsvm/', 'logistic/',
-           'sgd/']
+subdirs = ['conv/', 'conv_lstm/', 'lstm/', 'n_conv/', 'xgboost/', 'mnb/', 'svm/', 'nbsvm/', 'logistic/',
+           'sgd/', 'stack/']
 
 for sub in subdirs:
     path = 'models/' + sub

@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import glob
 
 from keras.layers import Dense, Input, Dropout, BatchNormalization
 from keras.layers.advanced_activations import PReLU
@@ -8,11 +9,11 @@ from keras.callbacks import ModelCheckpoint
 from keras.models import Model
 from keras import backend as K
 
-from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
+from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv, prepare_data
 
 
-MAX_NB_WORDS = 16000
-MAX_SEQUENCE_LENGTH = 140
+MAX_NB_WORDS = 95000
+MAX_SEQUENCE_LENGTH = 80
 VALIDATION_SPLIT = 0.1
 EMBEDDING_DIM = 300
 
@@ -41,19 +42,37 @@ def gen_model():
     # train a Long Short Term Memory network followed by Fully Connected layers
     sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
     embedded_sequences = embedding_layer(sequence_input)
-    x = LSTM(512, dropout_W=0.1, dropout_U=0.1, return_sequences=False)(embedded_sequences)
-    x = Dense(512, activation='linear')(x)
+    x = LSTM(512, dropout_W=0.2, dropout_U=0.2)(embedded_sequences)
+    x = Dense(1024, activation='linear')(x)
     x = PReLU()(x)
     x = Dropout(0.2)(x)
-    x = BatchNormalization(axis=channel_axis)(x)
-    x = Dense(512, activation='linear')(x)
+    x = Dense(1024, activation='linear')(x)
     x = PReLU()(x)
     x = Dropout(0.2)(x)
-    x = BatchNormalization(axis=channel_axis)(x)
     preds = Dense(3, activation='softmax')(x)
 
     model = Model(sequence_input, preds)
     return model
+
+def write_predictions(model_dir='lstm/'):
+    basepath = 'models/' + model_dir
+    path = basepath + "*.h5"
+
+    data, labels, texts, word_index = prepare_data()
+    files = glob.glob(path)
+
+    nb_models = len(files)
+    model_predictions = np.zeros((nb_models, data.shape[0], 3))
+
+    model = gen_model()
+
+    for i, fn in enumerate(files):
+        model.load_weights(fn)
+        model_predictions[i, :, :] = model.predict(data, batch_size=128)
+
+        print('Finished prediction for model %d' % (i + 1))
+
+    np.save(basepath + "lstm_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
     train_keras_model_cv(gen_model, 'lstm/lstm-model', max_nb_words=MAX_NB_WORDS,
