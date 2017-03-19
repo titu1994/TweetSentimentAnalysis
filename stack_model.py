@@ -40,12 +40,12 @@ def keras_model_gen():
 
 def stack_model_gen(C=1., max_depth=6, subsample=0.95, n_folds=10):
     model1 = LogisticRegression(C=C)
-    model2 = keras_model_gen()
-    model3 = xgb.XGBClassifier(max_depth=max_depth, learning_rate=0.01,
+    #model2 = keras_model_gen()
+    model2 = xgb.XGBClassifier(max_depth=max_depth, learning_rate=0.1,
                                n_estimators=500, objective='multi:softmax',
-                               subsample=subsample, seed=1000)
+                               subsample=subsample, seed=1000, silent=True)
 
-    models = [model1, ]
+    models = [model1, model2]
 
     model = StackedGeneralizer(blending_models=models, n_folds=n_folds)
     return model
