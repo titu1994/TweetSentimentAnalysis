@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import os
 import pickle
+import glob
+import ast
+import re
 np.random.seed(1000)
 
 from sklearn_utils import load_both
@@ -11,12 +14,16 @@ from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.utils.np_utils import to_categorical
+from keras.models import Model
 
 train_obama_path = "data/obama_csv.csv"
 train_romney_path = "data/romney_csv.csv"
 
 train_obama_full_path = "data/full_obama_csv.csv"
 train_romney_full_path = "data/full_romney_csv.csv"
+
+model_dirs = ['conv/', 'n_conv/', 'lstm/', ]
+
 
 def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_dim, print_error_words=True):
     if not os.path.exists('data/embedding_matrix index length %d max words %d embedding dim %d.npy' % (len(word_index),
@@ -247,7 +254,7 @@ def train_full_model(model_gen, model_fn, max_nb_words=16000, max_sequence_lengt
     print('\nTraining F1 Scores of Cross Validation: %0.4f' % (scores[-1]))
 
 
-def prepare_data(max_nb_words=16000, max_sequence_length=140, use_full_data=False):
+def prepare_data(max_nb_words, max_sequence_length, use_full_data=False):
     print('Loading data')
     texts, labels, label_map = load_both(use_full_data)
     print('Tokenizing texts')
@@ -255,6 +262,76 @@ def prepare_data(max_nb_words=16000, max_sequence_length=140, use_full_data=Fals
     print('Finished tokenizing texts')
     print('-' * 80)
     return data, labels, texts, word_index
+
+
+def get_keras_scores(normalize_weights=False):
+    clf_scores = []
+
+    for m, model_dir in enumerate(model_dirs):
+        weights_path = 'models/' + model_dir + '*.txt'
+
+        weight_path = glob.glob(weights_path)
+        print('Loading weight file [0]:', weight_path)
+
+        with open(weight_path[0], 'r') as f:
+            clf_weight_data = ast.literal_eval(f.readline())
+
+        clf_scores.extend(clf_weight_data)
+
+    if normalize_weights:
+        weight_sum = np.sum(np.asarray(clf_scores, dtype=np.float32))
+        weights = [w / weight_sum for w in clf_scores]
+        clf_scores = weights
+
+    return clf_scores
+
+def get_predictions_keras_models(models, data, normalize_weights=False):
+    model_preds = []
+    clf_scores = []
+
+    assert len(models) == len(model_dirs), 'Number of provided models must match ' \
+                                           'number of model directories specified in keras_utils'
+
+    for m, model_dir in enumerate(model_dirs):
+        path = 'models/' + model_dir + '*.h5'
+        weights_path = 'models/' + model_dir + '*.txt'
+
+        weight_path = glob.glob(weights_path)
+        print('Loading weight file [0]:', weight_path)
+
+        with open(weight_path[0], 'r') as f:
+            clf_weight_data = ast.literal_eval(f.readline())
+
+        fns = glob.glob(path)
+        cv_ids = []
+        for i in range(len(fns)):
+            fn = fns[i]
+            cv_id = re.search(r'\d+', fn).group()
+            cv_ids.append(int(cv_id))
+
+        clf_weight_data = [clf_weight_data[i - 1] for i in cv_ids]
+        clf_scores.extend(clf_weight_data)
+
+        model = models[m] #type: Model
+
+        temp_preds = np.zeros((len(cv_ids), data.shape[0], 3))
+
+        for j, fn in enumerate(fns):
+            model.load_weights(fn)
+            preds = model.predict(data, batch_size=100)
+            temp_preds[j, :, :] = preds
+
+            print('Got predictions for model - %s' % (fn))
+
+        model_preds.append(temp_preds.mean(axis=0))
+        print()
+
+    if normalize_weights:
+        weight_sum = np.sum(np.asarray(clf_scores, dtype=np.float32))
+        weights = [w / weight_sum for w in clf_scores]
+        clf_scores = weights
+
+    return (model_preds, clf_scores)
 
 if __name__ == '__main__':
     pass

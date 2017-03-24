@@ -29,7 +29,7 @@ nb_words = min(MAX_NB_WORDS, len(word_index))
 embedding_matrix = load_embedding_matrix(EMBEDDING_DIR + "/" + EMBEDDING_TYPE,
                                          word_index, MAX_NB_WORDS, EMBEDDING_DIM)
 
-def gen_model():
+def gen_lstm_model():
     channel_axis = 1 if K.image_dim_ordering() == 'th' else -1
     # load pre-trained word embeddings into an Embedding layer
     # note that we set trainable = False so as to keep the embeddings fixed
@@ -64,7 +64,7 @@ def write_predictions(model_dir='lstm/'):
     nb_models = len(files)
     model_predictions = np.zeros((nb_models, data.shape[0], 3))
 
-    model = gen_model()
+    model = gen_lstm_model()
 
     for i, fn in enumerate(files):
         model.load_weights(fn)
@@ -75,6 +75,6 @@ def write_predictions(model_dir='lstm/'):
     np.save(basepath + "lstm_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    train_keras_model_cv(gen_model, 'lstm/lstm-model', max_nb_words=MAX_NB_WORDS,
+    train_keras_model_cv(gen_lstm_model, 'lstm/lstm-model', max_nb_words=MAX_NB_WORDS,
                          max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=5,
                          nb_epoch=50)

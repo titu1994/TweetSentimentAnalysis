@@ -31,7 +31,7 @@ nb_words = min(MAX_NB_WORDS, len(word_index))
 embedding_matrix = load_embedding_matrix(EMBEDDING_DIR + "/" + EMBEDDING_TYPE,
                                           word_index, MAX_NB_WORDS, EMBEDDING_DIM)
 
-def gen_model():
+def gen_n_conv_model():
 
     # load pre-trained word embeddings into an Embedding layer
     # note that we set trainable = False so as to keep the embeddings fixed
@@ -71,7 +71,7 @@ def gen_model():
     return model
 
 if __name__ == '__main__':
-    train_keras_model_cv(gen_model, 'n_conv/n_conv-model', max_nb_words=MAX_NB_WORDS,
+    train_keras_model_cv(gen_n_conv_model, 'n_conv/n_conv-model', max_nb_words=MAX_NB_WORDS,
                          max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
                          nb_epoch=50)
 

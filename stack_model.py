@@ -8,12 +8,9 @@ import xgboost as xgb
 
 from stacked_generalization import StackedGeneralizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import f1_score
 
 import sklearn_utils as sk_utils
-import keras_utils as k_utils
 
 from keras.layers import Dense, Input, Dropout, BatchNormalization
 from keras.layers.advanced_activations import PReLU
@@ -117,5 +114,5 @@ if __name__ == '__main__':
     print('\t\t\t\t-1\t\t\t\t0\t\t\t\t+1\n')
     model.evaluate(labels, preds)
 
-    print('F1 score : ', score)
+    print('\nF1 score : ', score)
 

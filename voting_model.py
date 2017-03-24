@@ -9,7 +9,7 @@ from voting_ensemble import SoftVoteClassifier
 from sklearn.metrics import f1_score
 
 
-clfs, clf_weights = load_trained_models(normalize_weights=True)
+clfs, clf_weights = load_trained_sklearn_models(normalize_weights=True)
 
 def scoring(estimator, X, y):
     preds = estimator.predict(X)

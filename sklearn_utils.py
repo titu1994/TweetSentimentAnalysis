@@ -45,6 +45,21 @@ model_dirs = ['logistic/', 'mnb/', 'nbsvm/', 'svm/', 'sgd/', 'ridge/', ]
 model_dirs.append('xgboost/')
 
 
+def _get_predictions(model, X):
+    if hasattr(model, 'predict_proba'):  # Normal SKLearn classifiers
+        pred = model.predict_proba(X)
+    elif hasattr(model, '_predict_proba_lr'):  # SVMs
+        pred = model._predict_proba_lr(X)
+    else:
+        pred = model.predict(X)
+
+    if len(pred.shape) == 1:  # for 1-d ouputs
+        pred = pred[:, None]
+
+    return pred
+
+
+
 def load_both(use_full_data=False):
     if use_full_data:
         obama_df = pd.read_csv(train_obama_full_path, sep='\t', encoding='latin1')
@@ -241,9 +256,9 @@ def prepare_data(use_full_data=False, verbose=True):
     return data, labels
 
 
-def load_trained_models(model_dir_base='models/', normalize_weights=False):
-    clfs = []
-    clf_weights = []
+def load_trained_sklearn_models(model_dir_base='models/', normalize_weights=False):
+    name_clfs = []
+    clf_scores = []
     index = 0
 
     for model_dir in model_dirs:
@@ -264,11 +279,11 @@ def load_trained_models(model_dir_base='models/', normalize_weights=False):
             cv_ids.append(int(cv_id))
 
         clf_weight_data = [clf_weight_data[i - 1] for i in cv_ids]
-        clf_weights.extend(clf_weight_data)
+        clf_scores.extend(clf_weight_data)
 
         for fn in fns:
             model = joblib.load(fn)
-            clfs.append(('%s_%d' % (model.__class__.__name__, index + 1), model))
+            name_clfs.append(('%s_%d' % (model.__class__.__name__, index + 1), model))
             print('Added model - %s as %s_%d' % (fn, model.__class__.__name__, index + 1))
 
             index += 1
@@ -276,11 +291,55 @@ def load_trained_models(model_dir_base='models/', normalize_weights=False):
         print()
 
     if normalize_weights:
-        weight_sum = np.sum(np.asarray(clf_weights, dtype=np.float32))
-        weights = [w / weight_sum for w in clf_weights]
-        clf_weights = weights
+        weight_sum = np.sum(np.asarray(clf_scores, dtype=np.float32))
+        weights = [w / weight_sum for w in clf_scores]
+        clf_scores = weights
 
-    return (clfs, clf_weights)
+    return (name_clfs, clf_scores)
+
+
+def get_predictions_sklearn_models(data, normalize_weights=False):
+    model_preds = []
+    clf_scores = []
+
+    for m, model_dir in enumerate(model_dirs):
+        path = 'models/' + model_dir + '*.pkl'
+        weights_path = 'models/' + model_dir + '*.txt'
+
+        weight_path = glob.glob(weights_path)
+        print('Loading weight file [0]:', weight_path)
+
+        with open(weight_path[0], 'r') as f:
+            clf_weight_data = ast.literal_eval(f.readline())
+
+        fns = glob.glob(path)
+        cv_ids = []
+        for i in range(len(fns)):
+            fn = fns[i]
+            cv_id = re.search(r'\d+', fn).group()
+            cv_ids.append(int(cv_id))
+
+        clf_weight_data = [clf_weight_data[i - 1] for i in cv_ids]
+        clf_scores.extend(clf_weight_data)
+
+        temp_preds = np.zeros((len(cv_ids), data.shape[0], 3))
+
+        for j, fn in enumerate(fns):
+            model = joblib.load(fn)
+            preds = model.predict(data, batch_size=100)
+            temp_preds[j, :, :] = preds
+
+            print('Got predictions for model - %s' % (fn))
+
+        model_preds.append(temp_preds.mean(axis=0))
+        print()
+
+    if normalize_weights:
+        weight_sum = np.sum(np.asarray(clf_scores, dtype=np.float32))
+        weights = [w / weight_sum for w in clf_scores]
+        clf_scores = weights
+
+    return (model_preds, clf_scores)
 
 
 if __name__ == '__main__':
