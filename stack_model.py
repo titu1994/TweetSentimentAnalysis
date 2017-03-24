@@ -70,11 +70,16 @@ def fit(model_fn, use_full_data=False, seed=1000):
 
     print('Classifier stack finished predicting in %0.3f seconds.' % (t2 - t1))
 
+    print('\nEvaluationg stack model')
+    model.evaluate(labels, preds)
+    print()
+
     f1score = f1_score(labels, preds, average='micro')
 
     print('\nF1 Scores of Stack Estimator: %0.4f' % (f1score))
 
     joblib.dump(model, '%s.pkl' % (model_fn))
+
 
 def write_predictions(model_dir='stack/'):
     basepath = 'models/' + model_dir
@@ -86,7 +91,7 @@ def write_predictions(model_dir='stack/'):
     X_blend = StackedGeneralizer().transformBaseModels()
     nb_models = X_blend.shape[1]
 
-    nb_models = len(files)
+    #nb_models = len(files)
 
     model_predictions = np.zeros((nb_models, data.shape[0], 3))
 
@@ -99,12 +104,18 @@ def write_predictions(model_dir='stack/'):
     np.save(basepath + "stack_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    fit(model_fn='stack_model/stack-model')
+    #fit(model_fn='stack_model/stack-model')
 
-    # model = joblib.load('stack_model/stack-model.pkl') #type: StackedGeneralizer
-    # data, labels = sk_utils.prepare_data(False)
-    #
-    # preds = model.predict('models/*/')
-    # score = f1_score(labels, preds, average='micro')
-    #
-    # print('F1 score : ', score)
+    model = joblib.load('stack_model/stack-model.pkl') #type: StackedGeneralizer
+    data, labels = sk_utils.prepare_data(use_full_data=False)
+
+    preds = model.predict('models/*/', X_indices=None)
+    score = f1_score(labels, preds, average='micro')
+
+    print('Evaluating Model : ')
+    print('\t\t\t\t\t\t\tClasses')
+    print('\t\t\t\t-1\t\t\t\t0\t\t\t\t+1\n')
+    model.evaluate(labels, preds)
+
+    print('F1 score : ', score)
+

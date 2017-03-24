@@ -1,1 +1,2 @@
 models/*/*.txt
+stack_model/stack-model.pkl

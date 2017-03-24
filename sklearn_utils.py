@@ -3,6 +3,9 @@ import numpy as np
 import joblib
 import time
 import os
+import re
+import glob
+import ast
 import pickle
 
 np.random.seed(1000)
@@ -17,20 +20,30 @@ train_romney_path = "data/romney_csv.csv"
 train_obama_full_path = "data/full_obama_csv.csv"
 train_romney_full_path = "data/full_romney_csv.csv"
 
-if not os.path.exists('stack_model/'):
-    os.makedirs('stack_model/')
-
 if not os.path.exists('models/'):
     os.makedirs('models/')
 
-subdirs = ['conv/', 'conv_lstm/', 'lstm/', 'n_conv/', 'xgboost/', 'mnb/', 'svm/', 'nbsvm/', 'logistic/',
-           'sgd/']
+if not os.path.exists('stack_model/'):
+    os.makedirs('stack_model/')
+
+if not os.path.exists('vote_model/'):
+    os.makedirs('vote_model/')
+
+
+subdirs = ['conv/', 'lstm/', 'n_conv/', 'xgboost/', 'mnb/', 'svm/', 'nbsvm/', 'logistic/',
+           'sgd/', 'voting/', 'ridge/', ]
 
 for sub in subdirs:
     path = 'models/' + sub
 
     if not os.path.exists(path):
         os.makedirs(path)
+
+
+# Note, XGBoost requires data in DMatrix format, MUST be the last model in model_dirs!
+model_dirs = ['logistic/', 'mnb/', 'nbsvm/', 'svm/', 'sgd/', 'ridge/', ]
+model_dirs.append('xgboost/')
+
 
 def load_both(use_full_data=False):
     if use_full_data:
@@ -226,6 +239,48 @@ def prepare_data(use_full_data=False, verbose=True):
         print('Finished computing TF-IDF')
         print('-' * 80)
     return data, labels
+
+
+def load_trained_models(model_dir_base='models/', normalize_weights=False):
+    clfs = []
+    clf_weights = []
+    index = 0
+
+    for model_dir in model_dirs:
+        path = model_dir_base + model_dir + '*.pkl'
+        weights_path = model_dir_base + model_dir + '*.txt'
+
+        weight_path = glob.glob(weights_path)
+        print('Loading weight file [0]:', weight_path)
+
+        with open(weight_path[0], 'r') as f:
+            clf_weight_data = ast.literal_eval(f.readline())
+
+        fns = glob.glob(path)
+        cv_ids = []
+        for i in range(len(fns)):
+            fn = fns[i]
+            cv_id = re.search(r'\d+', fn).group()
+            cv_ids.append(int(cv_id))
+
+        clf_weight_data = [clf_weight_data[i - 1] for i in cv_ids]
+        clf_weights.extend(clf_weight_data)
+
+        for fn in fns:
+            model = joblib.load(fn)
+            clfs.append(('%s_%d' % (model.__class__.__name__, index + 1), model))
+            print('Added model - %s as %s_%d' % (fn, model.__class__.__name__, index + 1))
+
+            index += 1
+
+        print()
+
+    if normalize_weights:
+        weight_sum = np.sum(np.asarray(clf_weights, dtype=np.float32))
+        weights = [w / weight_sum for w in clf_weights]
+        clf_weights = weights
+
+    return (clfs, clf_weights)
 
 
 if __name__ == '__main__':

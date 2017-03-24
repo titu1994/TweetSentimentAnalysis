@@ -51,7 +51,6 @@ def gen_model():
     model = Model(sequence_input, preds)
     return model
 
-
 def write_predictions(model_dir='conv/'):
     basepath = 'models/' + model_dir
     path = basepath + "*.h5"

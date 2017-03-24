@@ -12,16 +12,17 @@ import keras.models as keras_models
 from keras.utils.np_utils import to_categorical
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
+
 def get_predictions(model, X):
-    if hasattr(model, 'predict_proba'): # Normal SKLearn classifiers
+    if hasattr(model, 'predict_proba'):  # Normal SKLearn classifiers
         pred = model.predict_proba(X)
-    elif hasattr(model, '_predict_proba_lr'): # SVMs
+    elif hasattr(model, '_predict_proba_lr'):  # SVMs
         pred = model._predict_proba_lr(X)
     else:
         pred = model.predict(X)
 
     if len(pred.shape) == 1:  # for 1-d ouputs
-            pred = pred[:, None]
+        pred = pred[:, None]
 
     return pred
 
@@ -95,9 +96,11 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
 
     def evaluate(self, y, y_pred):
         print(classification_report(y, y_pred))
-        print('Confusion Matrix:')
+        print('Confusion Matrix:\n')
+        print('\tClasses')
+        print('-1\t\t0\t\t+1')
         print(confusion_matrix(y, y_pred))
-        return(accuracy_score(y, y_pred))
+        return (accuracy_score(y, y_pred))
 
     def transformBaseModels(self, pred_dir='models/*/'):
         # predict via model averaging
@@ -110,7 +113,7 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
         for file in files:
             if self.verbose: print('Loading numpy file %s' % (file))
             cv_predictions = np.load(file)
-            predictions.append(cv_predictions.mean(axis=0)) # take mean on all cv predictions of that model
+            predictions.append(cv_predictions.mean(axis=0))  # take mean on all cv predictions of that model
 
         # concat all features
         predictions = np.hstack(predictions)
@@ -153,7 +156,8 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
                     y_train_categorical = to_categorical(y_train, 3)
                     y_test_categorical = to_categorical(y_test, 3)
 
-                    model.fit(X_train, y_train_categorical, batch_size=128, nb_epoch=50, callbacks=[checkpoint, reduce_lr],
+                    model.fit(X_train, y_train_categorical, batch_size=128, nb_epoch=50,
+                              callbacks=[checkpoint, reduce_lr],
                               validation_data=(X_test, y_test_categorical))
 
                     model.load_weights(model_path)
@@ -197,11 +201,12 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
             if cv_predictions is None:
                 cv_predictions = np.zeros((n_models, X_blend.shape[0], model_predictions.shape[1]))
 
-            cv_predictions[i,:,:] = model_predictions
+            cv_predictions[i, :, :] = model_predictions
 
         # perform model averaging to get predictions
         predictions = cv_predictions.mean(0)
         return predictions
+
 
 if __name__ == '__main__':
     model = StackedGeneralizer()
