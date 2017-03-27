@@ -10,7 +10,7 @@ from sklearn.metrics import f1_score
 
 
 def model_gen():
-    model = RidgeClassifier(alpha=1.0, random_state=1000)
+    model = RidgeClassifier(alpha=1.8, random_state=1000)
     return model
 
 def scoring(estimator, X, y):
@@ -18,8 +18,7 @@ def scoring(estimator, X, y):
     return f1_score(y, preds, average='micro')
 
 def param_search():
-    params = {'alpha' : [1e-1, 1, 10],
-             # 'beta' : [0.25, 0.3, 0.35, 0.4, 0.45, 0.5],
+    params = {'alpha' : [1.5, 1.6, 1.7, 1.8, 1.9, 2.0],
               }
     print('Params : ', params)
 
@@ -74,6 +73,6 @@ def write_predictions(model_dir='ridge/'):
     np.save(basepath + "ridge_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    #train_sklearn_model_cv(model_gen, 'ridge/ridge-model', k_folds=100, use_full_data=False)
+    train_sklearn_model_cv(model_gen, 'ridge/ridge-model', k_folds=100, use_full_data=False)
     #param_search()
     write_predictions()

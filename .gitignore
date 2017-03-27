@@ -3,4 +3,5 @@ data/*.h5
 models/*/*.h5
 models/*/*.pkl
 models/*/*.npy
+test/*/*.npy
 stack_model/*

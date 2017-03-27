@@ -9,9 +9,8 @@ from sklearn.metrics import f1_score, confusion_matrix
 
 
 def model_gen():
-    model = MultinomialNB(alpha=0.7)
+    model = MultinomialNB(alpha=0.149)
     return model
-
 
 def scoring(estimator, X, y):
     preds = estimator.predict(X)
@@ -19,7 +18,8 @@ def scoring(estimator, X, y):
 
 
 def param_search():
-    params = {'alpha' : np.linspace(0.6, 0.8, num=100)}
+    params = {'alpha' : np.linspace(0.05, 0.15, num=100),
+              }
     print('Params : ', params)
 
     model = MultinomialNB()
@@ -69,6 +69,6 @@ def write_predictions(model_dir='mnb/'):
     np.save(basepath + "mnb_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    #train_sklearn_model_cv(model_gen, 'mnb/mnb-model', k_folds=100, use_full_data=False)
+    train_sklearn_model_cv(model_gen, 'mnb/mnb-model', k_folds=100, use_full_data=False)
     #param_search()
     write_predictions()

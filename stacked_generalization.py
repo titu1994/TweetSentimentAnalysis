@@ -39,7 +39,7 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
     """Base class for stacked generalization classifier models
     """
 
-    def __init__(self, blending_models=None, n_folds=10, verbose=True):
+    def __init__(self, blending_models=None, n_folds=10, check_dirs=None, verbose=True):
         """
         Stacked Generalizer Classifier
 
@@ -57,6 +57,7 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
         """
         self.blending_models = blending_models
         self.n_folds = n_folds
+        self.check_dirs = check_dirs
         self.verbose = verbose
 
     def fit(self, X_indices, y):
@@ -111,9 +112,35 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
 
         files = glob.glob(path)
         for file in files:
-            if self.verbose: print('Loading numpy file %s' % (file))
-            cv_predictions = np.load(file)
-            predictions.append(cv_predictions.mean(axis=0))  # take mean on all cv predictions of that model
+            if self.check_dirs is not None:
+                for name in self.check_dirs:
+                    if name[:-1] in file:
+                        if self.verbose: print('Loading numpy file %s' % (file))
+
+                        cv_predictions = np.load(file)
+
+                        if 'voting' not in file:
+                            predictions.append(cv_predictions.mean(axis=0))   # take mean on all cv predictions of that model
+                        else:
+                            predictions.append(cv_predictions)
+
+                        break
+
+                continue
+            else:
+                if self.verbose: print('Loading numpy file %s' % (file))
+
+                cv_predictions = np.load(file)
+
+                print('Added file %s' % file)
+
+                if 'voting' not in file:
+                    predictions.append(cv_predictions.mean(axis=0))  # take mean on all cv predictions of that model
+                else:
+                    predictions.append(cv_predictions)
+
+        for p in predictions:
+            print(p.shape)
 
         # concat all features
         predictions = np.hstack(predictions)
@@ -141,9 +168,9 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
                 X_train, y_train = X_blend[train_idx], y[train_idx]
                 X_test, y_test = X_blend[test_idx], y[test_idx]
 
-                model = copy(blend_model)
+                if isinstance(blend_model, keras_models.Model) or isinstance(blend_model, keras_models.Sequential):
+                    model = blend_model
 
-                if isinstance(model, keras_models.Model) or isinstance(model, keras_models.Sequential):
                     model_path = 'stack_model/keras_model_%d_cv_%d' % (model_id + 1, j + 1) + '.h5'
                     checkpoint = ModelCheckpoint(model_path,
                                                  monitor='val_fbeta_score', verbose=1,
@@ -170,6 +197,8 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
                     print('Keras Model %d - CV %d Score : %0.3f' % (model_id + 1, j + 1, score))
 
                 else:
+                    model = copy(blend_model)
+
                     model_path = 'stack_model/sklearn_model_%d_cv_%d' % (model_id + 1, j + 1) + '.pkl'
                     model.fit(X_train, y_train)
 

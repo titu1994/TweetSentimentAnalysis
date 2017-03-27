@@ -10,7 +10,7 @@ from sklearn.metrics import f1_score
 
 
 def model_gen():
-    model = LogisticRegression(C=1.09)
+    model = LogisticRegression(C=1.8)
     return model
 
 def scoring(estimator, X, y):
@@ -18,8 +18,7 @@ def scoring(estimator, X, y):
     return f1_score(y, preds, average='micro')
 
 def param_search():
-    params = {'C' : np.linspace(1.0, 1.1, num=21),
-             # 'beta' : [0.25, 0.3, 0.35, 0.4, 0.45, 0.5],
+    params = {'C' :np.linspace(1, 2, num=21),
               }
     print('Params : ', params)
 
@@ -74,7 +73,6 @@ def write_predictions(model_dir='logistic/'):
     np.save(basepath + "logistic_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    #train_sklearn_model_cv(model_gen, 'logistic/logistic-model', k_folds=100, use_full_data=False)
-    #train_full_model(model_gen, 'logistic/logistic-model', use_full_data=False)
+    train_sklearn_model_cv(model_gen, 'logistic/logistic-model', k_folds=100, use_full_data=False)
     #param_search()
     write_predictions()

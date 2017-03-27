@@ -2,6 +2,7 @@ from sklearn.base import BaseEstimator
 from sklearn.base import ClassifierMixin
 import numpy as np
 import operator
+import glob
 import warnings
 
 def get_predictions(model, X):
@@ -148,6 +149,74 @@ class SoftVoteClassifier(BaseEstimator, ClassifierMixin):
 
             if self.verbose:
                 print('Obtained predictions of model %s' % name)
+
+        avg = np.average(self.probas_, axis=0, weights=self.weights)
+
+        return avg
+
+
+    def predict_dir(self, dir):
+        """
+        Parameters
+        ----------
+
+        dir : a directory containing the numpy arrays which contain the predictions
+
+        Returns
+        ----------
+
+        maj : list or numpy array, shape = [n_samples]
+            Predicted class labels by majority rule
+
+        """
+        self.probas_ = []
+        path = dir + "*.npy"
+        files = glob.glob(path)
+
+        for i, fn in enumerate(files):
+            if 'voting' in fn:
+                continue
+
+            preds = np.load(fn)
+            preds = preds.mean(axis=0)
+            self.probas_.append(preds)
+
+            if self.verbose:
+                print('Obtained predictions of model %d' % (i + 1))
+
+        avg = np.average(self.probas_, axis=0, weights=self.weights)
+        maj = np.argmax(avg, axis=1)
+        return maj
+
+    def predict_proba_dir(self, dir):
+
+        """
+        Parameters
+        ----------
+
+        dir : a directory containing the numpy arrays which contain the predictions
+
+        Returns
+        ----------
+
+        avg : list or numpy array, shape = [n_samples, n_probabilities]
+            Weighted average probability for each class per sample.
+
+        """
+        self.probas_ = []
+        path = dir + "*.npy"
+        files = glob.glob(path)
+
+        for i, fn in enumerate(files):
+            if 'voting' in fn:
+                continue
+
+            preds = np.load(fn)
+            preds = preds.mean(axis=0)
+            self.probas_.append(preds)
+
+            if self.verbose:
+                print('Obtained predictions of model %d' % (i + 1))
 
         avg = np.average(self.probas_, axis=0, weights=self.weights)
 

@@ -1,24 +1,22 @@
 import numpy as np
-import os
+import glob
+from sklearn_utils import f1_score
 
-from keras.utils.np_utils import to_categorical
 from keras.layers import Dense, Input, Dropout, merge
-from keras.regularizers import l2
-from keras.layers import Conv1D, MaxPooling1D, Embedding, GlobalMaxPooling1D, Flatten
-from keras.callbacks import ModelCheckpoint
+from keras.layers import Conv1D, Embedding, GlobalMaxPooling1D
 from keras.models import Model
 
 from keras import backend as K
 
-from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv
+from keras_utils import load_both, load_embedding_matrix, prepare_tokenized_data, train_keras_model_cv, prepare_data
 
 MAX_NB_WORDS = 95000
-MAX_SEQUENCE_LENGTH = 80
+MAX_SEQUENCE_LENGTH = 65
 VALIDATION_SPLIT = 0.1
 EMBEDDING_DIM = 300
 
 EMBEDDING_DIR = 'embedding'
-EMBEDDING_TYPE = 'glove.6B.300d.txt' # 'glove.6B.%dd.txt' % (EMBEDDING_DIM)
+EMBEDDING_TYPE = 'glove.840B.300d.txt' # 'glove.6B.%dd.txt' % (EMBEDDING_DIM)
 
 concat_axis = 1 if K.image_dim_ordering() == 'th' else -1
 
@@ -70,8 +68,65 @@ def gen_n_conv_model():
     model = Model(sequence_input, preds)
     return model
 
+
+def write_predictions(model_dir='n_conv/', mode='train'):
+    basepath = 'models/' + model_dir
+    path = basepath + "*.h5"
+
+    data, labels, texts, word_index = prepare_data(MAX_NB_WORDS, MAX_SEQUENCE_LENGTH, mode=mode)
+    files = glob.glob(path)
+
+    nb_models = len(files)
+    model_predictions = np.zeros((nb_models, data.shape[0], 3))
+
+    model = gen_n_conv_model()
+
+    for i, fn in enumerate(files):
+        model.load_weights(fn)
+        model_predictions[i, :, :] = model.predict(data, batch_size=128)
+
+        print('Finished prediction for model %d' % (i + 1))
+
+    if mode == 'train':
+        np.save(basepath + "n_conv_predictions.npy", model_predictions)
+    else:
+        preds_save_path = "test/" + model_dir + "n_conv_predictions.npy"
+        np.save(preds_save_path, model_predictions)
+
+
+def calculate_score(model_dir='n_conv/'):
+    basepath = 'test/' + model_dir
+    path = basepath + "*.npy"
+
+    data, labels, texts, word_index = prepare_data(MAX_NB_WORDS, MAX_SEQUENCE_LENGTH, mode='test')
+    files = glob.glob(path)
+
+    model_predictions = np.load(files[0])
+    print('Loaded predictions. Shape = ', model_predictions.shape)
+
+    best = -1
+    model_id = -1
+
+    for i in range(model_predictions.shape[0]):
+        preds = np.argmax(model_predictions[i], axis=1)
+
+        score = f1_score(labels, preds, average='micro')
+        print('F1 score of CV %d: ' % (i + 1), score)
+
+        if score > best:
+            best = score
+            model_id = i
+
+    print()
+    print('Model %d is the best with score %0.4f' % (model_id, best))
+
 if __name__ == '__main__':
-    train_keras_model_cv(gen_n_conv_model, 'n_conv/n_conv-model', max_nb_words=MAX_NB_WORDS,
-                         max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
-                         nb_epoch=50)
+    # train_keras_model_cv(gen_n_conv_model, 'n_conv/n_conv-model', max_nb_words=MAX_NB_WORDS,
+    #                      max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
+    #                      nb_epoch=50)
+
+    # write_predictions(mode='train')
+    # write_predictions(mode='test')
+
+    calculate_score()
 

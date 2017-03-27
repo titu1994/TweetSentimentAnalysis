@@ -11,7 +11,7 @@ from sklearn.metrics import f1_score
 
 
 def model_gen():
-    model = LinearSVC(C=0.102)
+    model = LinearSVC(C=0.152)
     return model
 
 def scoring(estimator, X, y):
@@ -19,7 +19,7 @@ def scoring(estimator, X, y):
     return f1_score(y, preds, average='micro')
 
 def param_search():
-    params = {'C' : np.linspace(0.09, 0.11, num=21),
+    params = {'C' : np.linspace(0.10, 0.2, num=51),
               }
     print('Params : ', params)
 
@@ -74,6 +74,6 @@ def write_predictions(model_dir='svm/'):
     np.save(basepath + "svm_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    #train_sklearn_model_cv(model_gen, 'svm/svm-model', k_folds=100, use_full_data=False)
+    train_sklearn_model_cv(model_gen, 'svm/svm-model', k_folds=100, use_full_data=False)
     #param_search()
     write_predictions()

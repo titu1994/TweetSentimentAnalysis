@@ -22,7 +22,10 @@ train_romney_path = "data/romney_csv.csv"
 train_obama_full_path = "data/full_obama_csv.csv"
 train_romney_full_path = "data/full_romney_csv.csv"
 
-model_dirs = ['conv/', 'n_conv/', 'lstm/', ]
+test_obama_path = "data/obama_csv_test.csv"
+test_romney_path = "data/romney_csv_test.csv"
+
+model_dirs = ['conv/', 'n_conv/', 'lstm/', 'bidirectional_lstm/']
 
 
 def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_dim, print_error_words=True):
@@ -81,30 +84,10 @@ def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_di
 
 
 def create_ngram_set(input_list, ngram_value=2):
-    """
-    Extract a set of n-grams from a list of integers.
-    >>> create_ngram_set([1, 4, 9, 4, 1, 4], ngram_value=2)
-    {(4, 9), (4, 1), (1, 4), (9, 4)}
-    >>> create_ngram_set([1, 4, 9, 4, 1, 4], ngram_value=3)
-    [(1, 4, 9), (4, 9, 4), (9, 4, 1), (4, 1, 4)]
-    """
     return set(zip(*[input_list[i:] for i in range(ngram_value)]))
 
 
 def add_ngram(sequences, token_indice, ngram_range=2):
-    """
-    Augment the input list of list (sequences) by appending n-grams values.
-    Example: adding bi-gram
-    >>> sequences = [[1, 3, 4, 5], [1, 3, 7, 9, 2]]
-    >>> token_indice = {(1, 3): 1337, (9, 2): 42, (4, 5): 2017}
-    >>> add_ngram(sequences, token_indice, ngram_range=2)
-    [[1, 3, 4, 5, 1337, 2017], [1, 3, 7, 9, 2, 1337, 42]]
-    Example: adding tri-gram
-    >>> sequences = [[1, 3, 4, 5], [1, 3, 7, 9, 2]]
-    >>> token_indice = {(1, 3): 1337, (9, 2): 42, (4, 5): 2017, (7, 9, 2): 2018}
-    >>> add_ngram(sequences, token_indice, ngram_range=3)
-    [[1, 3, 4, 5, 1337], [1, 3, 7, 9, 2, 1337, 2018]]
-    """
     new_sequences = []
     for input_list in sequences:
         new_list = input_list[:]
@@ -197,7 +180,7 @@ def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_l
         y_train_categorical = to_categorical(np.asarray(y_train))
         y_test_categorical = to_categorical(np.asarray(y_test))
 
-        model = model_gen()
+        model = model_gen() #type: Model
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', 'fbeta_score'])
 
         model_checkpoint = ModelCheckpoint('models/%s-cv-%d.h5' % (model_fn, i + 1), monitor='val_fbeta_score', verbose=2,
@@ -254,9 +237,9 @@ def train_full_model(model_gen, model_fn, max_nb_words=16000, max_sequence_lengt
     print('\nTraining F1 Scores of Cross Validation: %0.4f' % (scores[-1]))
 
 
-def prepare_data(max_nb_words, max_sequence_length, use_full_data=False):
-    print('Loading data')
-    texts, labels, label_map = load_both(use_full_data)
+def prepare_data(max_nb_words, max_sequence_length, mode='train',):
+    print('Loading %s data' % mode)
+    texts, labels, label_map = load_both(mode=mode)
     print('Tokenizing texts')
     data, word_index = prepare_tokenized_data(texts, max_nb_words, max_sequence_length)
     print('Finished tokenizing texts')
@@ -264,21 +247,21 @@ def prepare_data(max_nb_words, max_sequence_length, use_full_data=False):
     return data, labels, texts, word_index
 
 
-def get_keras_scores(normalize_weights=False):
+def get_keras_scores(normalize_scores=False):
     clf_scores = []
 
     for m, model_dir in enumerate(model_dirs):
         weights_path = 'models/' + model_dir + '*.txt'
 
         weight_path = glob.glob(weights_path)
-        print('Loading weight file [0]:', weight_path)
+        print('Loading score file [0]:', weight_path)
 
         with open(weight_path[0], 'r') as f:
             clf_weight_data = ast.literal_eval(f.readline())
 
         clf_scores.extend(clf_weight_data)
 
-    if normalize_weights:
+    if normalize_scores:
         weight_sum = np.sum(np.asarray(clf_scores, dtype=np.float32))
         weights = [w / weight_sum for w in clf_scores]
         clf_scores = weights
@@ -323,7 +306,14 @@ def get_predictions_keras_models(models, data, normalize_weights=False):
 
             print('Got predictions for model - %s' % (fn))
 
-        model_preds.append(temp_preds.mean(axis=0))
+        model_preds.append(temp_preds) # temp_preds.mean(axis=0)
+
+        preds_save_path = "test/" + model_dir + os.path.splitext(os.path.basename(weight_path[0]))[0] + '.npy'
+        preds = temp_preds.mean(axis=0)
+
+        np.save(preds_save_path, preds)
+        print('Saved predictions for %s in %s' % (model_dir[:-1], preds_save_path))
+
         print()
 
     if normalize_weights:
