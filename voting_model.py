@@ -1,4 +1,4 @@
-from sklearn_utils import load_trained_sklearn_models, load_both, prepare_data
+from sklearn_utils import load_trained_sklearn_models, prepare_data, evaluate
 from keras_utils import get_keras_scores
 import numpy as np
 import glob
@@ -37,26 +37,23 @@ for i in range(len(keras_scores) // 10):
 score_sum_ = sum(clf_weights)
 clf_weights = [s / score_sum_ for s in clf_weights]
 
-def scoring(estimator, X, y):
-    preds = estimator.predict(X)
-    return f1_score(y, preds, average='micro')
+model = SoftVoteClassifier(None, weights=clf_weights)
 
-def fit_voting_classifier():
-    model = SoftVoteClassifier(None, weights=clf_weights)
-
+def fit_voting_classifier(dataset='full'):
     np.random.seed(1000)
     # print('Loading data')
-    texts, labels, label_map = load_both(mode='test')
-    # print('Tokenizing texts')
-    # x_counts = tokenize(texts)
-    # print('Finished tokenizing texts')
-    # data = tfidf(x_counts)
-    # print('Finished computing TF-IDF')
+    data, labels = prepare_data(mode='test', dataset=dataset)
 
-    preds = model.predict_proba_dir('test/*/')
+    if dataset == 'full':
+        pred_dir = 'test/*/'
+    elif dataset == 'obama':
+        pred_dir = 'obama/*/'
+    else:
+        pred_dir = 'romney/*/'
 
-    score = f1_score(labels, np.argmax(preds, axis=1), average='micro')
-    print('\nF1 Score : ', score)
+    preds = model.predict_proba_dir(pred_dir)
+
+    evaluate(labels, np.argmax(preds, axis=1))
 
     # print('Saving predictions')
     # np.save('test/voting/voting_predictions.npy', preds)
@@ -70,7 +67,8 @@ def fit_voting_classifier():
     #
     # print('VotingClassifier fit complete!')
 
-
-
 if __name__ == '__main__':
-    fit_voting_classifier()
+    #fit_voting_classifier()
+
+    fit_voting_classifier(dataset='obama')
+    fit_voting_classifier(dataset='romney')

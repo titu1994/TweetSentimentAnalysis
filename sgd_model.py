@@ -76,6 +76,10 @@ def write_predictions(model_dir='sgd/'):
     np.save(basepath + "sgd_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    train_sklearn_model_cv(proba_model_gen, 'sgd/sgd-proba_model', k_folds=100, use_full_data=False)
+    #train_sklearn_model_cv(proba_model_gen, 'sgd/sgd-proba_model', k_folds=100, use_full_data=False)
     #param_search()
-    write_predictions()
+    #write_predictions()
+
+    # evaluate_sklearn_model('sgd/')
+    evaluate_sklearn_model('sgd/', dataset='obama')
+    evaluate_sklearn_model('sgd/', dataset='romney')

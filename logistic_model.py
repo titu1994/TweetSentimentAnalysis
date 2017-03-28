@@ -73,6 +73,10 @@ def write_predictions(model_dir='logistic/'):
     np.save(basepath + "logistic_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    train_sklearn_model_cv(model_gen, 'logistic/logistic-model', k_folds=100, use_full_data=False)
+    #train_sklearn_model_cv(model_gen, 'logistic/logistic-model', k_folds=100, use_full_data=False)
     #param_search()
-    write_predictions()
+    #write_predictions()
+
+    #evaluate_sklearn_model('logistic/')
+    evaluate_sklearn_model('logistic/', dataset='obama')
+    evaluate_sklearn_model('logistic/', dataset='romney')

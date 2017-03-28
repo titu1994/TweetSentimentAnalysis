@@ -7,7 +7,7 @@ import ast
 import re
 np.random.seed(1000)
 
-from sklearn_utils import load_both
+from sklearn_utils import load_both, load_obama, load_romney, classification_report, f1_score, accuracy_score, confusion_matrix
 from sklearn.model_selection import StratifiedKFold
 
 from keras.preprocessing.text import Tokenizer
@@ -29,9 +29,7 @@ model_dirs = ['conv/', 'n_conv/', 'lstm/', 'bidirectional_lstm/']
 
 
 def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_dim, print_error_words=True):
-    if not os.path.exists('data/embedding_matrix index length %d max words %d embedding dim %d.npy' % (len(word_index),
-                                                                                                       max_nb_words,
-                                                                                                       embedding_dim)):
+    if not os.path.exists('data/embedding_matrix max words %d embedding dim %d.npy' % (max_nb_words, embedding_dim)):
         embeddings_index = {}
         error_words = []
 
@@ -65,17 +63,14 @@ def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_di
                 # words not found in embedding index will be all-zeros.
                 embedding_matrix[i] = embedding_vector
 
-        np.save('data/embedding_matrix index length %d max words %d embedding dim %d.npy' % (len(word_index),
-                                                                                                max_nb_words,
-                                                                                                embedding_dim),
+        np.save('data/embedding_matrix max words %d embedding dim %d.npy' % (max_nb_words,
+                                                                                             embedding_dim),
                 embedding_matrix)
 
         print('Saved embedding matrix')
 
     else:
-        embedding_matrix = np.load('data/embedding_matrix index length %d max words %d embedding dim %d.npy' %
-                                                                                                (len(word_index),
-                                                                                                max_nb_words,
+        embedding_matrix = np.load('data/embedding_matrix max words %d embedding dim %d.npy' % (max_nb_words,
                                                                                                 embedding_dim))
 
         print('Loaded embedding matrix')
@@ -237,9 +232,18 @@ def train_full_model(model_gen, model_fn, max_nb_words=16000, max_sequence_lengt
     print('\nTraining F1 Scores of Cross Validation: %0.4f' % (scores[-1]))
 
 
-def prepare_data(max_nb_words, max_sequence_length, mode='train',):
+def prepare_data(max_nb_words, max_sequence_length, mode='train', dataset='full'):
+    assert dataset in ['full', 'obama', 'romney']
+
     print('Loading %s data' % mode)
-    texts, labels, label_map = load_both(mode=mode)
+
+    if dataset == 'full':
+        texts, labels, label_map = load_both(mode)
+    elif dataset == 'obama':
+        texts, labels, label_map = load_obama(mode)
+    else:
+        texts, labels, label_map = load_romney(mode)
+
     print('Tokenizing texts')
     data, word_index = prepare_tokenized_data(texts, max_nb_words, max_sequence_length)
     print('Finished tokenizing texts')
@@ -268,7 +272,7 @@ def get_keras_scores(normalize_scores=False):
 
     return clf_scores
 
-def get_predictions_keras_models(models, data, normalize_weights=False):
+def get_predictions_keras_models(models, data, save_dir, normalize_weights=False):
     model_preds = []
     clf_scores = []
 
@@ -308,7 +312,7 @@ def get_predictions_keras_models(models, data, normalize_weights=False):
 
         model_preds.append(temp_preds) # temp_preds.mean(axis=0)
 
-        preds_save_path = "test/" + model_dir + os.path.splitext(os.path.basename(weight_path[0]))[0] + '.npy'
+        preds_save_path = save_dir + "/" + model_dir + os.path.splitext(os.path.basename(weight_path[0]))[0] + '.npy'
         preds = temp_preds.mean(axis=0)
 
         np.save(preds_save_path, preds)

@@ -8,7 +8,6 @@ import xgboost as xgb
 
 from stacked_generalization import StackedGeneralizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score
 
 import sklearn_utils as sk_utils
 
@@ -50,7 +49,7 @@ def stack_model_gen(n_folds=10):
     return model
 
 
-def fit(model_fn, seed=1000):
+def fit(model_fn):
     data, labels = sk_utils.prepare_data() # train
 
     model = stack_model_gen()
@@ -72,51 +71,37 @@ def fit(model_fn, seed=1000):
     print('Classifier stack finished predicting in %0.3f seconds.' % (t2 - t1))
 
     print('\nEvaluationg stack model')
-    model.evaluate(test_labels, preds)
+    sk_utils.evaluate(test_labels, preds)
     print()
-
-    f1score = f1_score(test_labels, preds, average='micro')
-
-    print('\nF1 Scores of Stack Estimator: %0.4f' % (f1score))
 
     joblib.dump(model, '%s.pkl' % (model_fn))
 
 
-def write_predictions(model_fn='stack_model/stack-model', model_dir='stack/'):
-    basepath = model_fn + model_dir
-    path = basepath + "*.pkl"
+def write_predictions(model_fn='stack_model/stack-model', dataset='full'):
+    basepath = model_fn
+    path = basepath + ".pkl"
 
-    data, labels = sk_utils.prepare_data()
-    files = glob.glob(path)
+    data, labels = sk_utils.prepare_data(mode='test', dataset=dataset)
+    model = joblib.load(path) # type: StackedGeneralizer
 
-    X_blend = StackedGeneralizer().transformBaseModels()
-    nb_models = X_blend.shape[1]
+    if dataset == 'full':
+        pred_dir = 'test/*/'
+    elif dataset == 'obama':
+        pred_dir = 'obama/*/'
+    else:
+        pred_dir = 'romney/*/'
 
-    #nb_models = len(files)
+    preds_proba = model.predict_proba(pred_dir)
+    preds = np.argmax(preds_proba, axis=1)
 
-    model_predictions = np.zeros((nb_models, data.shape[0], 3))
+    sk_utils.evaluate(labels, preds)
 
-    for i, fn in enumerate(files):
-        model = joblib.load(fn) # type: StackedGeneralizer
-
-        model_predictions[i, :, :] = model.predict_proba('data/*/')
-        print('Finished prediction for model %d' % (i + 1))
-
-    np.save(basepath + "stack_predictions.npy", model_predictions)
+    np.save("stack_model/stack_predictions-%s.npy" % (dataset), preds_proba)
 
 if __name__ == '__main__':
     fit(model_fn='stack_model/stack-model')
 
-    # model = joblib.load('stack_model/stack-model.pkl') #type: StackedGeneralizer
-    # data, labels = sk_utils.prepare_data()
-    #
-    # preds = model.predict('models/*/', X_indices=None)
-    # score = f1_score(labels, preds, average='micro')
-    #
-    # print('Evaluating Model : ')
-    # print('\t\t\t\t\t\t\tClasses')
-    # print('\t\t\t\t-1\t\t\t\t0\t\t\t\t+1\n')
-    # model.evaluate(labels, preds)
-    #
-    # print('\nF1 score : ', score)
+    #write_predictions()
+    #write_predictions(dataset='obama')
+    #write_predictions(dataset='romney')
 

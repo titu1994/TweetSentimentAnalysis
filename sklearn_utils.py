@@ -14,7 +14,7 @@ np.random.seed(1000)
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, classification_report, accuracy_score, confusion_matrix
 
 train_obama_path = "data/obama_csv.csv"
 train_romney_path = "data/romney_csv.csv"
@@ -38,7 +38,7 @@ subdirs = ['conv/', 'lstm/', 'bidirectional_lstm/', 'n_conv/', 'xgboost/', 'mnb/
            'sgd/', 'voting/', 'ridge/', ]
 
 for sub in subdirs:
-    for base in ['models/', 'test/']:
+    for base in ['models/', 'test/', 'obama/', 'romney/']:
         path = base + sub
 
         if not os.path.exists(path):
@@ -61,6 +61,64 @@ def _get_predictions(model, X):
         pred = pred[:, None]
 
     return pred
+
+
+def load_obama(mode='train'):
+    if mode == 'train':
+        obama_df = pd.read_csv(train_obama_path, sep='\t', encoding='latin1')
+    else:
+        obama_df = pd.read_csv(test_obama_path, sep='\t', encoding='latin1')
+    # Remove rows who have no class label attached, can hand label later
+    obama_df = obama_df[pd.notnull(obama_df['label'])]
+    obama_df['label'] = obama_df['label'].astype(np.int)
+
+    texts = []  # list of text samples
+    labels_index = {-1: 0,
+                    0: 1,
+                    1: 2}  # dictionary mapping label name to numeric id
+    labels = []  # list of label ids
+
+    obama_df = obama_df[obama_df['label'] != 2]  # drop all rows with class = 2
+
+    nb_rows = len(obama_df)
+    for i in range(nb_rows):
+        row = obama_df.iloc[i]
+        texts.append(str(row['tweet']))
+        labels.append(labels_index[int(row['label'])])
+
+    texts = np.asarray(texts)
+    labels = np.asarray(labels)
+
+    return texts, labels, labels_index
+
+
+def load_romney(mode='train'):
+    if mode == 'train':
+        romney_df = pd.read_csv(train_romney_path, sep='\t', encoding='latin1')
+    else:
+        romney_df = pd.read_csv(test_romney_path, sep='\t', encoding='latin1')
+    # Remove rows who have no class label attached, can hand label later
+    romney_df = romney_df[pd.notnull(romney_df['label'])]
+    romney_df['label'] = romney_df['label'].astype(np.int)
+
+    texts = []  # list of text samples
+    labels_index = {-1: 0,
+                    0: 1,
+                    1: 2}  # dictionary mapping label name to numeric id
+    labels = []  # list of label ids
+
+    romney_df = romney_df[romney_df['label'] != 2]  # drop all rows with class = 2
+
+    nb_rows = len(romney_df)
+    for i in range(nb_rows):
+        row = romney_df.iloc[i]
+        texts.append(str(row['tweet']))
+        labels.append(labels_index[int(row['label'])])
+
+    texts = np.asarray(texts)
+    labels = np.asarray(labels)
+
+    return texts, labels, labels_index
 
 
 def load_both(mode='train'):
@@ -246,9 +304,18 @@ def train_sklearn_model_cv(model_gen, model_fn, use_full_data=False, k_folds=3, 
 #     print()
 
 
-def prepare_data(mode='train', verbose=True):
+def prepare_data(mode='train', dataset='full', verbose=True):
+    assert dataset in ['full', 'obama', 'romney']
+
     if verbose: print('Loading %s data' % mode)
-    texts, labels, label_map = load_both(mode)
+
+    if dataset == 'full':
+        texts, labels, label_map = load_both(mode)
+    elif dataset == 'obama':
+        texts, labels, label_map = load_obama(mode)
+    else:
+        texts, labels, label_map = load_romney(mode)
+
     if verbose: print('Tokenizing texts')
     x_counts = tokenize(texts)
     if verbose: print('Finished tokenizing texts')
@@ -323,7 +390,7 @@ def get_sklearn_scores(normalize_scores=False):
     return clf_scores
 
 
-def get_predictions_sklearn_models(data, normalize_weights=False):
+def get_predictions_sklearn_models(data, save_path='test/', normalize_weights=False):
     model_preds = []
     clf_scores = []
 
@@ -364,7 +431,7 @@ def get_predictions_sklearn_models(data, normalize_weights=False):
 
         model_preds.append(temp_preds) # temp_preds.mean(axis=0)
 
-        preds_save_path = "test/" + model_dir + os.path.splitext(os.path.basename(weight_path[0]))[0] + '.npy'
+        preds_save_path = save_path + model_dir + os.path.splitext(os.path.basename(weight_path[0]))[0] + '.npy'
         preds = temp_preds
 
         np.save(preds_save_path, preds)
@@ -380,7 +447,58 @@ def get_predictions_sklearn_models(data, normalize_weights=False):
     return (model_preds, clf_scores)
 
 
+def evaluate_sklearn_model(model_dir, dataset='full'):
+    data, labels = prepare_data(mode='test', dataset=dataset)
+
+    path = 'models/' + model_dir + '*.pkl'
+    fns = glob.glob(path)
+    temp_preds = np.zeros((len(fns), data.shape[0], 3))
+
+    xgb_data = xgb.DMatrix(data)
+    class_name = ""
+
+    for j, fn in enumerate(fns):
+        model = joblib.load(fn)
+        class_name = model.__class__.__name__
+
+        if not 'xgb' in fn:
+            preds = _get_predictions(model, data)
+        else:
+            preds = _get_predictions(model, xgb_data)
+
+        temp_preds[j, :, :] = preds
+
+        #print('Got predictions for model - %s' % (fn))
+
+    preds = temp_preds.mean(axis=0)
+    preds = np.argmax(preds, axis=1)
+
+    print('Evaluating Model %s' % class_name)
+    print()
+    evaluate(labels, preds)
+
+
+def evaluate(y_true, y_pred):
+    f1score = f1_score(y_true, y_pred, average='micro')
+    print('F1 score: ', f1score)
+    print()
+    print(classification_report(y_true, y_pred))
+    print('Confusion Matrix:\n')
+    print('\tClasses')
+    print('-1\t\t0\t\t+1')
+    print(confusion_matrix(y_true, y_pred))
+    print()
+    print('Accuracy Score : ', accuracy_score(y_true, y_pred))
+    print()
+
+
 if __name__ == '__main__':
-    test_data, labels = prepare_data(mode='test')
-    get_predictions_sklearn_models(test_data)
+    #test_data, labels = prepare_data(mode='test')
+    #get_predictions_sklearn_models(test_data, save_path='obama/')
+
+    obama_data, obama_labels = prepare_data(mode='test', dataset='obama')
+    get_predictions_sklearn_models(obama_data, save_path='obama/')
+
+    romney_data, romney_labels = prepare_data(mode='test', dataset='romney')
+    get_predictions_sklearn_models(romney_data, save_path='romney/')
     pass

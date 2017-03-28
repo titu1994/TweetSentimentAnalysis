@@ -143,5 +143,9 @@ def write_predictions(model_dir='xgboost/'):
     np.save(basepath + "xgboost_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    train_xgboost(iters=1000, k_folds=100)
-    write_predictions()
+    #train_xgboost(iters=1000, k_folds=100)
+    #write_predictions()
+
+    # evaluate_sklearn_model('xgboost/')
+    evaluate_sklearn_model('xgboost/', dataset='obama')
+    evaluate_sklearn_model('xgboost/', dataset='romney')

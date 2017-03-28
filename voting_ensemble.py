@@ -1,5 +1,6 @@
 from sklearn.base import BaseEstimator
 from sklearn.base import ClassifierMixin
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 import numpy as np
 import operator
 import glob

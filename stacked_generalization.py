@@ -68,6 +68,7 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
         else:
             self._fitBlendingModel(X_blend, y)
 
+
     def predict(self, pred_directory, X_indices=None):
         # perform model averaging to get predictions
         predictions_dir = pred_directory if pred_directory is not None else 'models/*/'
@@ -94,14 +95,6 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
             predictions = self._transformBlendingModel(X_blend)
 
         return predictions
-
-    def evaluate(self, y, y_pred):
-        print(classification_report(y, y_pred))
-        print('Confusion Matrix:\n')
-        print('\tClasses')
-        print('-1\t\t0\t\t+1')
-        print(confusion_matrix(y, y_pred))
-        return (accuracy_score(y, y_pred))
 
     def transformBaseModels(self, pred_dir='models/*/'):
         # predict via model averaging
@@ -138,9 +131,6 @@ class StackedGeneralizer(BaseEstimator, ClassifierMixin):
                     predictions.append(cv_predictions.mean(axis=0))  # take mean on all cv predictions of that model
                 else:
                     predictions.append(cv_predictions)
-
-        for p in predictions:
-            print(p.shape)
 
         # concat all features
         predictions = np.hstack(predictions)

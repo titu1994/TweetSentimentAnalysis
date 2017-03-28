@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import glob
-from sklearn.metrics import f1_score
+from sklearn_utils import evaluate
 
 from keras.layers import Dense, Input, Dropout, BatchNormalization
 from keras.layers.advanced_activations import PReLU
@@ -55,11 +55,11 @@ def gen_lstm_model():
     model = Model(sequence_input, preds)
     return model
 
-def write_predictions(model_dir='lstm/', mode='train'):
+def write_predictions(model_dir='lstm/', mode='train', dataset='full'):
     basepath = 'models/' + model_dir
     path = basepath + "*.h5"
 
-    data, labels, texts, word_index = prepare_data(MAX_NB_WORDS, MAX_SEQUENCE_LENGTH, mode=mode)
+    data, labels, texts, word_index = prepare_data(MAX_NB_WORDS, MAX_SEQUENCE_LENGTH, mode=mode, dataset=dataset)
     files = glob.glob(path)
 
     nb_models = len(files)
@@ -76,34 +76,30 @@ def write_predictions(model_dir='lstm/', mode='train'):
     if mode == 'train':
         np.save(basepath + "lstm_predictions.npy", model_predictions)
     else:
-        preds_save_path = "test/" + model_dir + "lstm_predictions.npy"
+        if dataset == 'full':
+            save_dir = 'test'
+        else:
+            save_dir = dataset
+
+        preds_save_path = save_dir + "/" + model_dir + "lstm_predictions.npy"
         np.save(preds_save_path, model_predictions)
 
-def calculate_score(model_dir='lstm/'):
-    basepath = 'test/' + model_dir
+
+def calculate_score(model_dir='lstm/', base_dir='test/', dataset='full'):
+    basepath = base_dir + model_dir
     path = basepath + "*.npy"
 
-    data, labels, texts, word_index = prepare_data(MAX_NB_WORDS, MAX_SEQUENCE_LENGTH, mode='test')
+    data, labels, texts, word_index = prepare_data(MAX_NB_WORDS, MAX_SEQUENCE_LENGTH, mode='test', dataset=dataset)
     files = glob.glob(path)
 
     model_predictions = np.load(files[0])
     print('Loaded predictions. Shape = ', model_predictions.shape)
 
-    best = -1
-    model_id = -1
+    model_predictions = model_predictions.mean(axis=0)
 
-    for i in range(model_predictions.shape[0]):
-        preds = np.argmax(model_predictions[i], axis=1)
+    preds = np.argmax(model_predictions, axis=1)
+    evaluate(labels, preds)
 
-        score = f1_score(labels, preds, average='micro')
-        print('F1 score of CV %d: ' % (i + 1), score)
-
-        if score > best:
-            best = score
-            model_id = i
-
-    print()
-    print('Model %d is the best with score %0.4f' % (model_id, best))
 
 if __name__ == '__main__':
     # train_keras_model_cv(gen_lstm_model, 'lstm/lstm-model', max_nb_words=MAX_NB_WORDS,
@@ -112,5 +108,9 @@ if __name__ == '__main__':
 
     # write_predictions(mode='train')
     # write_predictions(mode='test')
+    #write_predictions(mode='test', dataset='obama')
+    #write_predictions(mode='test', dataset='romney')
 
-    calculate_score()
+    #calculate_score()
+    calculate_score(base_dir='obama/', dataset='obama')
+    calculate_score(base_dir='romney/', dataset='romney')

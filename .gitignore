@@ -4,4 +4,6 @@ models/*/*.h5
 models/*/*.pkl
 models/*/*.npy
 test/*/*.npy
+obama/*/*.npy
+romney/*/*.npy
 stack_model/*
