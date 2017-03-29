@@ -35,7 +35,7 @@ bi_lstm_scores = clf_scores[30:]
 print()
 
 print('Cross Validation Scores')
-print(['-'] * 80)
+print('-' * 80)
 
 for k, v in model_scores.items():
     print("Model %s : Mean Score : %0.5f" % (k, v))
@@ -49,5 +49,5 @@ print('Bi-LSTM Scores : ', sum(bi_lstm_scores) / len(bi_lstm_scores))
 
 print()
 print('Stacked Generatlizer score : ')
-print(['-'] * 80)
+print('-' * 80)
 

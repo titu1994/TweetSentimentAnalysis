@@ -142,26 +142,10 @@ def prepare_tokenized_data(texts, max_nb_words, max_sequence_length, ngram_range
     return (data, word_index)
 
 
-def prepare_validation_set(data, labels, validation_split=0.1):
-
-    indices = np.arange(data.shape[0])
-    np.random.shuffle(indices)
-    data = data[indices]
-    labels = labels[indices]
-    nb_validation_samples = int(validation_split * data.shape[0])
-
-    x_train = data[:-nb_validation_samples]
-    y_train = labels[:-nb_validation_samples]
-    x_val = data[-nb_validation_samples:]
-    y_val = labels[-nb_validation_samples:]
-
-    return (x_train, y_train, x_val, y_val)
-
-
-def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_length=140, use_full_data=False,
+def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_length=140,
                          k_folds=3, nb_epoch=40, batch_size=100, seed=1000):
 
-    data, labels, texts, word_index = prepare_data(max_nb_words, max_sequence_length, use_full_data)
+    data, labels, texts, word_index = prepare_data(max_nb_words, max_sequence_length)
 
     print("Dataset :", data.shape)
     skf = StratifiedKFold(k_folds, shuffle=True, random_state=seed)

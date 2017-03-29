@@ -108,8 +108,8 @@ if __name__ == '__main__':
 
     # write_predictions(mode='train')
     # write_predictions(mode='test')
-    write_predictions(mode='test', dataset='obama')
-    write_predictions(mode='test', dataset='romney')
+    #write_predictions(mode='test', dataset='obama')
+    #write_predictions(mode='test', dataset='romney')
 
     # calculate_score()
     calculate_score(base_dir='obama/', dataset='obama')

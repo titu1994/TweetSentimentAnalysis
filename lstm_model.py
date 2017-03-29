@@ -3,6 +3,8 @@ import os
 import glob
 from sklearn_utils import evaluate
 
+import tensorflow as tf
+
 from keras.layers import Dense, Input, Dropout, BatchNormalization
 from keras.layers.advanced_activations import PReLU
 from keras.layers import Embedding, LSTM
@@ -40,17 +42,29 @@ def gen_lstm_model():
                                 input_length=MAX_SEQUENCE_LENGTH,
                                 trainable=False, mask_zero=True)
 
+
     # train a Long Short Term Memory network followed by Fully Connected layers
-    sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
-    embedded_sequences = embedding_layer(sequence_input)
-    x = LSTM(512, dropout_W=0.2, dropout_U=0.2)(embedded_sequences)
-    x = Dense(1024, activation='linear')(x)
-    x = PReLU()(x)
-    x = Dropout(0.2)(x)
-    x = Dense(1024, activation='linear')(x)
-    x = PReLU()(x)
-    x = Dropout(0.2)(x)
-    preds = Dense(3, activation='softmax')(x)
+    with tf.name_scope('input'):
+        sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
+
+    with tf.name_scope('embedding'):
+        embedded_sequences = embedding_layer(sequence_input)
+
+    with tf.name_scope('lstm'):
+        x = LSTM(512, dropout_W=0.2, dropout_U=0.2)(embedded_sequences)
+
+    with tf.name_scope('dense_block_1'):
+        x = Dense(1024, activation='linear')(x)
+        x = PReLU()(x)
+        x = Dropout(0.2)(x)
+
+    with tf.name_scope('dense_block_2'):
+        x = Dense(1024, activation='linear')(x)
+        x = PReLU()(x)
+        x = Dropout(0.2)(x)
+
+    with tf.name_scope('output'):
+        preds = Dense(3, activation='softmax')(x)
 
     model = Model(sequence_input, preds)
     return model
@@ -102,6 +116,7 @@ def calculate_score(model_dir='lstm/', base_dir='test/', dataset='full'):
 
 
 if __name__ == '__main__':
+
     # train_keras_model_cv(gen_lstm_model, 'lstm/lstm-model', max_nb_words=MAX_NB_WORDS,
     #                      max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
     #                      nb_epoch=25)
@@ -114,3 +129,15 @@ if __name__ == '__main__':
     #calculate_score()
     calculate_score(base_dir='obama/', dataset='obama')
     calculate_score(base_dir='romney/', dataset='romney')
+    # path = "D:/Users/Yue/PycharmProjects/TweetSentimentAnalysis/logs/lstm_logs"
+    # sess = tf.Session()
+    # K.set_session(sess)
+    #
+    # model = gen_lstm_model()
+    # model.compile('adam', 'categorical_crossentropy')
+    #
+    # graph = sess.graph
+    #
+    # writer = tf.summary.FileWriter('logs/lstm_logs/', graph)
+    # writer.close()
+

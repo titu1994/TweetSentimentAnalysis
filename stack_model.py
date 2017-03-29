@@ -99,9 +99,9 @@ def write_predictions(model_fn='stack_model/stack-model', dataset='full'):
     np.save("stack_model/stack_predictions-%s.npy" % (dataset), preds_proba)
 
 if __name__ == '__main__':
-    fit(model_fn='stack_model/stack-model')
+    #fit(model_fn='stack_model/stack-model')
 
     #write_predictions()
-    #write_predictions(dataset='obama')
-    #write_predictions(dataset='romney')
+    write_predictions(dataset='obama')
+    write_predictions(dataset='romney')
 
