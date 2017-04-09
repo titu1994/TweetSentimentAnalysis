@@ -433,16 +433,16 @@ def evaluate_sklearn_model(model_dir, dataset='full'):
 
 
 def evaluate(y_true, y_pred):
-    f1score = f1_score(y_true, y_pred, average='micro')
-    print('F1 score: ', f1score)
+    f1score = f1_score(y_true, y_pred, labels=[0, 2], average='micro')
+    print('F1 score (+/- classes) : ', f1score)
     print()
-    print(classification_report(y_true, y_pred))
-    print('Confusion Matrix:\n')
+    print(classification_report(y_true, y_pred, labels=[0, 2]))
+    print('Confusion Matrix (+/- classes) :\n')
     print('\tClasses')
-    print('-1\t\t0\t\t+1')
-    print(confusion_matrix(y_true, y_pred))
+    print('-1\t\t+1')
+    print(confusion_matrix(y_true, y_pred, labels=[0, 2]))
     print()
-    print('Accuracy Score : ', accuracy_score(y_true, y_pred))
+    print('Accuracy Score (all 3 classes) : ', accuracy_score(y_true, y_pred))
     print()
 
 
