@@ -67,6 +67,7 @@ def gen_lstm_model():
         preds = Dense(3, activation='softmax')(x)
 
     model = Model(sequence_input, preds)
+    model.summary()
     return model
 
 def write_predictions(model_dir='lstm/', mode='train', dataset='full'):
@@ -116,19 +117,20 @@ def calculate_score(model_dir='lstm/', base_dir='test/', dataset='full'):
 
 
 if __name__ == '__main__':
-
+    gen_lstm_model()
     # train_keras_model_cv(gen_lstm_model, 'lstm/lstm-model', max_nb_words=MAX_NB_WORDS,
     #                      max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
     #                      nb_epoch=25)
 
     # write_predictions(mode='train')
     # write_predictions(mode='test')
-    #write_predictions(mode='test', dataset='obama')
-    #write_predictions(mode='test', dataset='romney')
+    # write_predictions(mode='test', dataset='obama')
+    # write_predictions(mode='test', dataset='romney')
 
     #calculate_score()
     calculate_score(base_dir='obama/', dataset='obama')
     calculate_score(base_dir='romney/', dataset='romney')
+
     # path = "D:/Users/Yue/PycharmProjects/TweetSentimentAnalysis/logs/lstm_logs"
     # sess = tf.Session()
     # K.set_session(sess)
