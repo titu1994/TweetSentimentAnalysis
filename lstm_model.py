@@ -32,6 +32,8 @@ nb_words = min(MAX_NB_WORDS, len(word_index))
 embedding_matrix = load_embedding_matrix(EMBEDDING_DIR + "/" + EMBEDDING_TYPE,
                                          word_index, MAX_NB_WORDS, EMBEDDING_DIM)
 
+print(nb_words, len(word_index))
+
 def gen_lstm_model():
     channel_axis = 1 if K.image_dim_ordering() == 'th' else -1
     # load pre-trained word embeddings into an Embedding layer
@@ -128,14 +130,14 @@ if __name__ == '__main__':
     # write_predictions(mode='test', dataset='romney')
 
     #calculate_score()
-    calculate_score(base_dir='obama/', dataset='obama')
-    calculate_score(base_dir='romney/', dataset='romney')
+    #calculate_score(base_dir='obama/', dataset='obama')
+    #calculate_score(base_dir='romney/', dataset='romney')
 
     # path = "D:/Users/Yue/PycharmProjects/TweetSentimentAnalysis/logs/lstm_logs"
     # sess = tf.Session()
     # K.set_session(sess)
     #
-    # model = gen_lstm_model()
+    model = gen_lstm_model()
     # model.compile('adam', 'categorical_crossentropy')
     #
     # graph = sess.graph

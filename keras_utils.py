@@ -312,6 +312,16 @@ def get_predictions_keras_models(models, data, save_dir, normalize_weights=False
     return (model_preds, clf_scores)
 
 if __name__ == '__main__':
+    max_nb_words = 90046
+    max_sequence_length = 65
+
+    data, labels, texts, word_index = prepare_data(max_nb_words, max_sequence_length)
+
+    print(data.shape)
+    print(data.dtype)
+    print(data[0])
+    print('\n', '*' * 80, '\n')
+    print(data[1])
     pass
 
 
