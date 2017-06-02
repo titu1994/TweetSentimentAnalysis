@@ -43,3 +43,5 @@ We performed 10 fold cross validation on both the Stacked Generalization model a
 The LSTM RNN performed the best, getting a test time score of nearly 68 %, beating the earlier 64 % benchmark.
 
 The strongest ensemble learning model was the Stacked Ensemble, achieving the second highest score of 66.9 %.
+
+<img src="https://github.com/titu1994/TweetSentimentAnalysis/blob/master/data/scores.png?raw=true" width=100%>
