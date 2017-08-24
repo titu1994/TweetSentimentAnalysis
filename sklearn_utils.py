@@ -34,8 +34,8 @@ if not os.path.exists('stack_model/'):
 if not os.path.exists('vote_model/'):
     os.makedirs('vote_model/')
 
-subdirs = ['conv/', 'lstm/', 'bidirectional_lstm/', 'n_conv/', 'xgboost/', 'mnb/', 'svm/', 'nbsvm/', 'logistic/',
-           'sgd/', 'voting/', 'ridge/', ]
+subdirs = ['conv/', 'lstm/', 'bidirectional_lstm/', 'n_conv/',  'xgboost/', 'mnb/', 'svm/', 'nbsvm/', 'logistic/',
+           'sgd/', 'voting/', 'ridge/', 'multiplicative_lstm/']
 
 for sub in subdirs:
     for base in ['models/', 'test/', 'obama/', 'romney/']:

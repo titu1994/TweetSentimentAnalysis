@@ -25,7 +25,7 @@ train_romney_full_path = "data/full_romney_csv.csv"
 test_obama_path = "data/obama_csv_test.csv"
 test_romney_path = "data/romney_csv_test.csv"
 
-model_dirs = ['conv/', 'n_conv/', 'lstm/', 'bidirectional_lstm/']
+model_dirs = ['conv/', 'n_conv/', 'lstm/', 'bidirectional_lstm/', 'multiplicative_lstm/']
 
 
 def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_dim, print_error_words=True):
