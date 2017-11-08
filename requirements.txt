@@ -1,6 +1,6 @@
 numpy
 pandas
-keras==1.2.2
+keras
 tensorflow-gpu>=1.0
 scikit-learn
 nbsvm

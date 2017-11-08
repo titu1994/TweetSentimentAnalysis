@@ -5,9 +5,11 @@ import pickle
 import glob
 import ast
 import re
+
 np.random.seed(1000)
 
-from sklearn_utils import load_both, load_obama, load_romney, classification_report, f1_score, accuracy_score, confusion_matrix
+from sklearn_utils import load_both, load_obama, load_romney, classification_report, f1_score, accuracy_score, \
+    confusion_matrix
 from sklearn.model_selection import StratifiedKFold
 
 from keras.preprocessing.text import Tokenizer
@@ -15,6 +17,7 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.utils.np_utils import to_categorical
 from keras.models import Model
+from keras import backend as K
 
 train_obama_path = "data/obama_csv.csv"
 train_romney_path = "data/romney_csv.csv"
@@ -28,10 +31,49 @@ test_romney_path = "data/romney_csv_test.csv"
 model_dirs = ['conv/', 'n_conv/', 'lstm/', 'bidirectional_lstm/', 'multiplicative_lstm/']
 
 
+def fbeta_score(y_true, y_pred):
+    '''
+    Computes the fbeta score. For ease of use, beta is set to 1.
+    Therefore always computes f1_score
+    '''
+    def recall(y_true, y_pred):
+        """Recall metric.
+
+        Only computes a batch-wise average of recall.
+
+        Computes the recall, a metric for multi-label classification of
+        how many relevant items are selected.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
+
+    def precision(y_true, y_pred):
+        """Precision metric.
+
+        Only computes a batch-wise average of precision.
+
+        Computes the precision, a metric for multi-label classification of
+        how many selected items are relevant.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+
+    precision = precision(y_true, y_pred)
+    recall = recall(y_true, y_pred)
+    return 2 * ((precision * recall) / (precision + recall))
+
+
 def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_dim, print_error_words=True):
     if not os.path.exists('data/embedding_matrix max words %d embedding dim %d.npy' % (max_nb_words, embedding_dim)):
         embeddings_index = {}
         error_words = []
+
+        print("Creating embedding matrix")
+        print("Loading : ", embedding_path)
 
         f = open(embedding_path, encoding='utf8')
         for line in f:
@@ -46,7 +88,7 @@ def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_di
         f.close()
 
         if len(error_words) > 0:
-            print("%d words were not added." % (len(error_words)))
+            print("%d words could not be added." % (len(error_words)))
             if print_error_words:
                 print("Words are : \n", error_words)
 
@@ -64,7 +106,7 @@ def load_embedding_matrix(embedding_path, word_index, max_nb_words, embedding_di
                 embedding_matrix[i] = embedding_vector
 
         np.save('data/embedding_matrix max words %d embedding dim %d.npy' % (max_nb_words,
-                                                                                             embedding_dim),
+                                                                             embedding_dim),
                 embedding_matrix)
 
         print('Saved embedding matrix')
@@ -98,7 +140,7 @@ def add_ngram(sequences, token_indice, ngram_range=2):
 
 def prepare_tokenized_data(texts, max_nb_words, max_sequence_length, ngram_range=2):
     if not os.path.exists('data/tokenizer.pkl'):
-        tokenizer = Tokenizer(nb_words=max_nb_words)
+        tokenizer = Tokenizer(num_words=max_nb_words)
         tokenizer.fit_on_texts(texts)
 
         with open('data/tokenizer.pkl', 'wb') as f:
@@ -138,13 +180,11 @@ def prepare_tokenized_data(texts, max_nb_words, max_sequence_length, ngram_range
 
     data = pad_sequences(sequences, maxlen=max_sequence_length)
 
-
     return (data, word_index)
 
 
 def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_length=140,
                          k_folds=3, nb_epoch=40, batch_size=100, seed=1000):
-
     data, labels, texts, word_index = prepare_data(max_nb_words, max_sequence_length)
 
     print("Dataset :", data.shape)
@@ -159,12 +199,15 @@ def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_l
         y_train_categorical = to_categorical(np.asarray(y_train))
         y_test_categorical = to_categorical(np.asarray(y_test))
 
-        model = model_gen() #type: Model
-        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', 'fbeta_score'])
+        K.clear_session()
 
-        model_checkpoint = ModelCheckpoint('models/%s-cv-%d.h5' % (model_fn, i + 1), monitor='val_fbeta_score', verbose=2,
-                                 save_weights_only=True,
-                                 save_best_only=True, mode='max')
+        model = model_gen()  # type: Model
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', fbeta_score])
+
+        model_checkpoint = ModelCheckpoint('models/%s-cv-%d.h5' % (model_fn, i + 1), monitor='val_fbeta_score',
+                                           verbose=2,
+                                           save_weights_only=True,
+                                           save_best_only=True, mode='max')
 
         reduce_lr = ReduceLROnPlateau(monitor='val_fbeta_score', patience=5, mode='max',
                                       factor=0.8, cooldown=5, min_lr=1e-6, verbose=2)
@@ -174,7 +217,7 @@ def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_l
 
         model.load_weights('models/%s-cv-%d.h5' % (model_fn, i + 1))
 
-        scores  = model.evaluate(x_test, y_test_categorical, batch_size=batch_size)
+        scores = model.evaluate(x_test, y_test_categorical, batch_size=batch_size)
         fbeta_scores.append(scores[-1])
 
         print('\nF1 Scores of Cross Validation %d: %0.4f' % (i + 1, scores[-1]))
@@ -189,14 +232,13 @@ def train_keras_model_cv(model_gen, model_fn, max_nb_words=16000, max_sequence_l
 
 def train_full_model(model_gen, model_fn, max_nb_words=16000, max_sequence_length=140, use_full_data=False,
                      nb_epoch=40, batch_size=100, seed=1000):
-
     np.random.seed(seed)
     data, labels, texts, word_index = prepare_data(max_nb_words, max_sequence_length, use_full_data)
 
     labels_categorical = to_categorical(np.asarray(labels))
 
     model = model_gen()
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc', 'fbeta_score'])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', fbeta_score])
 
     model_checkpoint = ModelCheckpoint('models/%s-final.h5' % (model_fn), monitor='val_fbeta_score', verbose=2,
                                        save_weights_only=True,
@@ -256,6 +298,7 @@ def get_keras_scores(normalize_scores=False):
 
     return clf_scores
 
+
 def get_predictions_keras_models(models, data, save_dir, normalize_weights=False):
     model_preds = []
     clf_scores = []
@@ -283,7 +326,7 @@ def get_predictions_keras_models(models, data, save_dir, normalize_weights=False
         clf_weight_data = [clf_weight_data[i - 1] for i in cv_ids]
         clf_scores.extend(clf_weight_data)
 
-        model = models[m] #type: Model
+        model = models[m]  # type: Model
 
         temp_preds = np.zeros((len(cv_ids), data.shape[0], 3))
 
@@ -294,7 +337,7 @@ def get_predictions_keras_models(models, data, save_dir, normalize_weights=False
 
             print('Got predictions for model - %s' % (fn))
 
-        model_preds.append(temp_preds) # temp_preds.mean(axis=0)
+        model_preds.append(temp_preds)  # temp_preds.mean(axis=0)
 
         preds_save_path = save_dir + "/" + model_dir + os.path.splitext(os.path.basename(weight_path[0]))[0] + '.npy'
         preds = temp_preds.mean(axis=0)
@@ -311,6 +354,7 @@ def get_predictions_keras_models(models, data, save_dir, normalize_weights=False
 
     return (model_preds, clf_scores)
 
+
 if __name__ == '__main__':
     max_nb_words = 90046
     max_sequence_length = 65
@@ -323,5 +367,3 @@ if __name__ == '__main__':
     print('\n', '*' * 80, '\n')
     print(data[1])
     pass
-
-

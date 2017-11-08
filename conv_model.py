@@ -99,15 +99,15 @@ def calculate_score(model_dir='conv/', base_dir='test/', dataset='full'):
 
 
 if __name__ == '__main__':
-    # train_keras_model_cv(gen_conv_model, 'conv/conv-model', max_nb_words=MAX_NB_WORDS,
-    #                      max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
-    #                      nb_epoch=50)
+    train_keras_model_cv(gen_conv_model, 'conv/conv-model', max_nb_words=MAX_NB_WORDS,
+                         max_sequence_length=MAX_SEQUENCE_LENGTH, k_folds=10,
+                         nb_epoch=50)
 
-    # write_predictions(mode='train')
-    # write_predictions(mode='test')
+    write_predictions(mode='train')
+    write_predictions(mode='test')
     #write_predictions(mode='test', dataset='obama')
     #write_predictions(mode='test', dataset='romney')
 
-    #calculate_score()
-    calculate_score(base_dir='obama/', dataset='obama')
-    calculate_score(base_dir='romney/', dataset='romney')
+    calculate_score()
+    #calculate_score(base_dir='obama/', dataset='obama')
+    #calculate_score(base_dir='romney/', dataset='romney')

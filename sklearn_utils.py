@@ -196,7 +196,7 @@ def tfidf(x_counts):
     return x_tfidf
 
 
-def train_sklearn_model_cv(model_gen, model_fn, use_full_data=False, k_folds=3, seed=1000):
+def train_sklearn_model_cv(model_gen, model_fn, k_folds=3, seed=1000):
     data, labels = prepare_data()
 
     skf = StratifiedKFold(k_folds, shuffle=True, random_state=seed)

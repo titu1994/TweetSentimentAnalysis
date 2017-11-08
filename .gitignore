@@ -7,3 +7,4 @@ test/*/*.npy
 obama/*/*.npy
 romney/*/*.npy
 stack_model/*
+v1_old/*
