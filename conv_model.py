@@ -43,7 +43,7 @@ def gen_conv_model():
     # train a 1D convnet with global maxpooling
     sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
     embedded_sequences = embedding_layer(sequence_input)
-    x = Conv1D(512, 5, activation='relu', border_mode='same', init='he_uniform')(embedded_sequences)
+    x = Conv1D(512, 5, activation='relu', padding='same', kernel_initializer='he_uniform')(embedded_sequences)
     x = GlobalMaxPooling1D()(x)
     x = Dense(1024, activation='relu')(x)
     x = Dropout(0.5)(x)
