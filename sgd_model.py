@@ -11,7 +11,7 @@ from sklearn.metrics import f1_score
 
 def proba_model_gen():
     n_iter = np.ceil((10 ** 6) / 10000) # 100 iterations
-    model = SGDClassifier(alpha=1e-5, n_iter=n_iter, loss="log")
+    model = SGDClassifier(alpha=1e-5, max_iter=n_iter, loss="log")
     return model
 
 def scoring(estimator, X, y):
@@ -76,10 +76,10 @@ def write_predictions(model_dir='sgd/'):
     np.save(basepath + "sgd_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    #train_sklearn_model_cv(proba_model_gen, 'sgd/sgd-proba_model', k_folds=100, use_full_data=False)
+    train_sklearn_model_cv(proba_model_gen, 'sgd/sgd-proba_model', k_folds=100)
     #param_search()
-    #write_predictions()
+    write_predictions()
 
-    # evaluate_sklearn_model('sgd/')
+    evaluate_sklearn_model('sgd/')
     evaluate_sklearn_model('sgd/', dataset='obama')
     evaluate_sklearn_model('sgd/', dataset='romney')
