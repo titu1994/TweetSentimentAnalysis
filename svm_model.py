@@ -74,10 +74,10 @@ def write_predictions(model_dir='svm/'):
     np.save(basepath + "svm_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    #train_sklearn_model_cv(model_gen, 'svm/svm-model', k_folds=100, use_full_data=False)
+    train_sklearn_model_cv(model_gen, 'svm/svm-model', k_folds=100)
     #param_search()
-    #write_predictions()
+    write_predictions()
 
-    # evaluate_sklearn_model('svm/')
+    evaluate_sklearn_model('svm/')
     evaluate_sklearn_model('svm/', dataset='obama')
     evaluate_sklearn_model('svm/', dataset='romney')
