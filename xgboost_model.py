@@ -17,10 +17,10 @@ params = {
     'booster': 'gblinear',
     'objective': 'multi:softprob',
     'eta': 0.01,
-    'max_depth': 10,
+    'max_depth': 8,
     'subsample': 1.0,
     'lambda': 1e-2,
-    'updater': 'grow_gpu',
+    'updater': 'grow_hist',
     'num_class': 3,
     'eval_metric': 'mlogloss',
     'seed': 1000,
@@ -51,7 +51,7 @@ def train_xgboost(iters=100, k_folds=10, use_full_data=False, seed=1000):
 
         model = xgb.train(params, train, num_boost_round=iters,
                           evals=[(val, 'val')], verbose_eval=False,
-                          early_stopping_rounds=50) # type: Booster
+                          early_stopping_rounds=20) # type: Booster
 
         t2 = time.time()
         print('Classifier %d training time : %0.3f seconds.' % (i + 1, t2 - t1))
@@ -143,7 +143,7 @@ def write_predictions(model_dir='xgboost/'):
     np.save(basepath + "xgboost_predictions.npy", model_predictions)
 
 if __name__ == '__main__':
-    train_xgboost(iters=1000, k_folds=100)
+    train_xgboost(iters=200, k_folds=100)
     write_predictions()
 
     evaluate_sklearn_model('xgboost/')
